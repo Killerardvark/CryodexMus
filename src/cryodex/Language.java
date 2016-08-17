@@ -170,7 +170,7 @@ public class Language {
 	public static final String match_results = "Partida Resultados";
 	public static final String is_the_winner = "es el ganador";
 	public static final String to = "a";
-	public static final String event = "Event";
+	public static final String event = "Evento";
 	public static final String rankings = "Rankings";
 	public static final String tournament_report = "Informe Torneo";
 	public static final String i_wish_to_drop = "NO TRANSLATION";

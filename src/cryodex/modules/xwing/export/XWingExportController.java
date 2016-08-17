@@ -160,10 +160,10 @@ public class XWingExportController {
 		for (XWingMatch m : matches) {
 			String matchString = "";
 			if (m.getPlayer2() != null) {
-				matchString += "<table width=100%><tr><th><h4>" + Language.event + " " + tournament.getName() + " - " +Language.round+" " + roundNumber + " - "+Language.table+" " + counter
+				matchString += "<table width=100%><tr><th><h4>" +Language.round+" " + roundNumber + " - "+Language.table+" " + counter
 						+ "</h4></th><th vAlign=bottom align=left><h4>" + m.getPlayer1().getName()
 						+ "</h4></th><th vAlign=bottom align=left><h4>" + m.getPlayer2().getName()
-						+ "</h4></th></tr><tr><td><table border=\"1\"><tr><th>"+Language.name+"</th><th>"+Language.rank+"</td><th>"+Language.score+"</th><th>"+Language.mov+"</th><th>"+Language.sos+"</th></tr><tr>"
+						+ "</h4></th></tr><tr><td><b>" + Language.event + ": " + tournament.getName() + "<b/><table border=\"1\"><tr><th>"+Language.name+"</th><th>"+Language.rank+"</td><th>"+Language.score+"</th><th>"+Language.mov+"</th><th>"+Language.sos+"</th></tr><tr>"
 						+ "<td class=\"smallFont\">" + m.getPlayer1().getName() + "</td><td class=\"smallFont\">"
 						+ m.getPlayer1().getRank(tournament) + "</td><td class=\"smallFont\">"
 						+ m.getPlayer1().getScore(tournament) + "</td><td class=\"smallFont\">"
@@ -206,10 +206,10 @@ public class XWingExportController {
 		for (XWingMatch m : matches) {
 			String matchString = "";
 			if (m.getPlayer2() != null) {
-				matchString += "<table width=100%><tr><td><h4>" + Language.event + " " + tournament.getName() + " - " +Language.round+" " + roundNumber + " - "+Language.table+" " + counter
+				matchString += "<table width=100%><tr><td><h4>" +Language.round+" " + roundNumber + " - "+Language.table+" " + counter
 						+ "</h4></td><td vAlign=bottom align=left><h4>" + m.getPlayer1().getName()
 						+ "</h4></td><td vAlign=bottom align=left><h4>" + m.getPlayer2().getName()
-						+ "</h4></td></tr><tr><td>" + "</td><td class=\"smallFont\">"
+						+ "</h4></td></tr><tr><td><b>" + Language.event + ": " + tournament.getName() + "</b></td><td class=\"smallFont\">"
 						+ "<div style=\"vertical-align: bottom; height: 100%;\">"+Language.points+" ____________</div>"
 						+ "</br>"
 						+ "<div style=\"vertical-align: top; height: 100%;\"><input type=\"text\" style=\"width: 25px\"/> <input type=\"text\" style=\"width: 25px\"/> <input type=\"text\" style=\"width: 25px\"/></div>"
