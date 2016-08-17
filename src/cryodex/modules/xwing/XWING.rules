@@ -1,0 +1,37 @@
+<articles>
+<article>
+<id>1</id>
+<name>Cards</name>
+<parent>0</parent>
+<data>Cards Article</data>
+<related></related>
+</article>
+<article>
+<id>2</id>
+<name>Turn Order</name>
+<parent>0</parent>
+<data>Turn Order Article</data>
+<related></related>
+</article>
+<article>
+<id>3</id>
+<name>Planning</name>
+<parent>2</parent>
+<data>Planning Article</data>
+<related></related>
+</article>
+<article>
+<id>4</id>
+<name>Combat</name>
+<parent>2</parent>
+<data>Combat Article</data>
+<related></related>
+</article>
+<article>
+	<id>5</id>
+	<name>Clean Up</name>
+	<parent>2</parent>
+	<data>this is just a test with a link to #4 and #2<br><br>Reference: FAQ Version X.X Page 4</data>
+	<related>#2,#4</related>
+</article>
+</articles>
