@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 
 import cryodex.modules.Module;
 import cryodex.modules.Tournament;
-import cryodex.modules.xwing.XWingModule;
+import cryodex.modules.mus.MusModule;
 import cryodex.widget.ComponentUtils;
 import cryodex.xml.XMLUtils;
 import cryodex.xml.XMLUtils.Element;
@@ -30,7 +30,7 @@ import cryodex.xml.XMLUtils.Element;
 public class CryodexController {
 
 	public static enum Modules {
-		XWING("Mus", XWingModule.getInstance());
+		XWING("Mus", MusModule.getInstance());
 
 		Module module;
 		String name;

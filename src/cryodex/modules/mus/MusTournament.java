@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,28 +24,32 @@ import cryodex.xml.XMLObject;
 import cryodex.xml.XMLUtils;
 import cryodex.xml.XMLUtils.Element;
 
-public class XWingTournament implements XMLObject, Tournament {
+public class MusTournament implements XMLObject, Tournament {
 
 	public enum InitialSeedingEnum {
 		RANDOM, BY_GROUP, IN_ORDER;
 	}
+	
+	public enum TournamentTypeEnum {
+		SWISS, SINGLE, DOUBLE, TRIPLE;
+	}
 
-	private final List<XWingRound> rounds;
-	private List<XWingPlayer> players;
+	private final List<MusRound> rounds;
+	private List<MusPlayer> players;
 	private final InitialSeedingEnum seedingEnum;
-	private final XWingTournamentGUI tournamentGUI;
+	private final MusTournamentGUI tournamentGUI;
 	private String name;
 	private final Integer points;
 	private List<Integer> escalationPoints;
-	private boolean startAsSingleElimination = false;
+	private TournamentTypeEnum tournamentType = TournamentTypeEnum.SWISS;
 
-	public XWingTournament(Element tournamentElement) {
+	public MusTournament(Element tournamentElement) {
 
 		this.players = new ArrayList<>();
 		this.rounds = new ArrayList<>();
 		seedingEnum = InitialSeedingEnum.RANDOM;
 
-		tournamentGUI = new XWingTournamentGUI(this);
+		tournamentGUI = new MusTournamentGUI(this);
 
 		String playerIDs = tournamentElement.getStringFromChild("PLAYERS");
 
@@ -55,7 +59,7 @@ public class XWingTournament implements XMLObject, Tournament {
 			Player p = CryodexController.getPlayerByID(s);
 
 			if (p != null) {
-				XWingPlayer xp = (XWingPlayer) p.getModuleInfoByModule(m);
+				MusPlayer xp = (MusPlayer) p.getModuleInfoByModule(m);
 				if (xp != null) {
 					players.add(xp);
 				}
@@ -65,11 +69,17 @@ public class XWingTournament implements XMLObject, Tournament {
 		Element roundElement = tournamentElement.getChild("ROUNDS");
 
 		for (Element e : roundElement.getChildren()) {
-			rounds.add(new XWingRound(e, this));
+			rounds.add(new MusRound(e, this));
 		}
 
 		name = tournamentElement.getStringFromChild("NAME");
 		points = tournamentElement.getIntegerFromChild("POINTS");
+		
+		String tournamentTypeString = tournamentElement.getStringFromChild("TOURNAMENTTYPE");
+		
+		if(tournamentTypeString != null && tournamentTypeString.isEmpty() == false){
+			tournamentType = TournamentTypeEnum.valueOf(tournamentTypeString);
+		}
 
 		String escalationPointsString = tournamentElement
 				.getStringFromChild("ESCALATIONPOINTS");
@@ -83,8 +93,8 @@ public class XWingTournament implements XMLObject, Tournament {
 		}
 
 		int counter = 1;
-		for (XWingRound r : rounds) {
-			if (r.isSingleElimination()) {
+		for (MusRound r : rounds) {
+			if (r.isSingleElimination() && isElimination() == false) {
 				getTournamentGUI().getRoundTabbedPane()
 						.addSingleEliminationTab(r.getMatches().size() * 2,
 								r.getPanel());
@@ -99,21 +109,21 @@ public class XWingTournament implements XMLObject, Tournament {
 		getTournamentGUI().getRankingTable().setPlayers(getAllXWingPlayers());
 	}
 
-	public XWingTournament(String name, List<XWingPlayer> players,
+	public MusTournament(String name, List<MusPlayer> players,
 			InitialSeedingEnum seedingEnum, Integer points,
-			List<Integer> escalationPoints, boolean isSingleElimination) {
+			List<Integer> escalationPoints, TournamentTypeEnum tournamentType) {
 		this.name = name;
 		this.players = new ArrayList<>(players);
 		this.rounds = new ArrayList<>();
 		this.seedingEnum = seedingEnum;
 		this.points = points;
 		this.escalationPoints = escalationPoints;
-		this.startAsSingleElimination = isSingleElimination;
+		this.tournamentType = tournamentType;
 
-		tournamentGUI = new XWingTournamentGUI(this);
+		tournamentGUI = new MusTournamentGUI(this);
 	}
 
-	public XWingRound getLatestRound() {
+	public MusRound getLatestRound() {
 		if (rounds == null || rounds.isEmpty()) {
 			return null;
 		} else {
@@ -121,9 +131,9 @@ public class XWingTournament implements XMLObject, Tournament {
 		}
 	}
 
-	public int getRoundNumber(XWingRound round) {
+	public int getRoundNumber(MusRound round) {
 		int count = 0;
-		for (XWingRound r : rounds) {
+		for (MusRound r : rounds) {
 			count++;
 			if (r == round) {
 				return count;
@@ -133,7 +143,7 @@ public class XWingTournament implements XMLObject, Tournament {
 		return 0;
 	}
 
-	public XWingRound getRound(int i) {
+	public MusRound getRound(int i) {
 		if (rounds == null) {
 			return null;
 		} else {
@@ -141,7 +151,7 @@ public class XWingTournament implements XMLObject, Tournament {
 		}
 	}
 
-	public XWingRound getSelectedRound() {
+	public MusRound getSelectedRound() {
 		if (rounds == null) {
 			return null;
 		} else {
@@ -150,7 +160,7 @@ public class XWingTournament implements XMLObject, Tournament {
 		}
 	}
 
-	public List<XWingRound> getAllRounds() {
+	public List<MusRound> getAllRounds() {
 		return rounds;
 	}
 
@@ -165,10 +175,10 @@ public class XWingTournament implements XMLObject, Tournament {
 
 	@Override
 	public void setPlayers(List<Player> players) {
-		List<XWingPlayer> xwPlayers = new ArrayList<>();
+		List<MusPlayer> xwPlayers = new ArrayList<>();
 
 		for (Player p : players) {
-			XWingPlayer xp = new XWingPlayer(p);
+			MusPlayer xp = new MusPlayer(p);
 			xwPlayers.add(xp);
 		}
 
@@ -179,18 +189,18 @@ public class XWingTournament implements XMLObject, Tournament {
 	public List<Player> getPlayers() {
 		List<Player> players = new ArrayList<Player>();
 
-		for (XWingPlayer xp : getXWingPlayers()) {
+		for (MusPlayer xp : getXWingPlayers()) {
 			players.add(xp.getPlayer());
 		}
 
 		return players;
 	}
 
-	public List<XWingPlayer> getXWingPlayers() {
+	public List<MusPlayer> getXWingPlayers() {
 		return players;
 	}
 
-	public void setXWingPlayer(List<XWingPlayer> players) {
+	public void setXWingPlayer(List<MusPlayer> players) {
 		this.players = players;
 	}
 
@@ -200,15 +210,15 @@ public class XWingTournament implements XMLObject, Tournament {
 	 * 
 	 * @return
 	 */
-	public Set<XWingPlayer> getAllXWingPlayers() {
+	public Set<MusPlayer> getAllXWingPlayers() {
 		// TreeSets and Head To Head comparisons can have problems.
 		// Do not use them together.
-		Set<XWingPlayer> allPlayers = new TreeSet<XWingPlayer>(
-				new XWingComparator(this,
-						XWingComparator.rankingCompareNoHeadToHead));
+		Set<MusPlayer> allPlayers = new TreeSet<MusPlayer>(
+				new MusComparator(this,
+						MusComparator.rankingCompareNoHeadToHead));
 
-		for (XWingRound r : getAllRounds()) {
-			for (XWingMatch m : r.getMatches()) {
+		for (MusRound r : getAllRounds()) {
+			for (MusMatch m : r.getMatches()) {
 				if (m.isBye()) {
 					allPlayers.add(m.getPlayer1());
 				} else {
@@ -229,7 +239,7 @@ public class XWingTournament implements XMLObject, Tournament {
 	public Set<Player> getAllPlayers() {
 		Set<Player> players = new TreeSet<Player>();
 
-		for (XWingPlayer xp : getAllXWingPlayers()) {
+		for (MusPlayer xp : getAllXWingPlayers()) {
 			players.add(xp.getPlayer());
 		}
 
@@ -237,7 +247,7 @@ public class XWingTournament implements XMLObject, Tournament {
 	}
 
 	@Override
-	public XWingTournamentGUI getTournamentGUI() {
+	public MusTournamentGUI getTournamentGUI() {
 		return tournamentGUI;
 	}
 
@@ -262,7 +272,7 @@ public class XWingTournament implements XMLObject, Tournament {
 	@Override
 	public void updateVisualOptions() {
 		if (CryodexController.isLoading == false) {
-			for (XWingRound r : getAllRounds()) {
+			for (MusRound r : getAllRounds()) {
 				r.getPanel().resetGamePanels(true);
 			}
 		}
@@ -281,25 +291,28 @@ public class XWingTournament implements XMLObject, Tournament {
 
 		// Single elimination checks
 		if (getLatestRound().isSingleElimination()) {
+			
+			generateEliminationRound(getAllRounds().size() + 1);
+			
 			// If there was only one match then there is no reason to create a
 			// new round.
-			if (getLatestRound().getMatches().size() == 1) {
-				JOptionPane
-						.showMessageDialog(Main.getInstance(),
-								Language.final_round);
-				return false;
-			}
-
-			if (getLatestRound().isValid(true) == false) {
-				JOptionPane
-						.showMessageDialog(
-								Main.getInstance(),
-								Language.round_invalid);
-				return false;
-			}
-
-			generateSingleEliminationMatches(getLatestRound().getMatches()
-					.size());
+//			if (getLatestRound().getMatches().size() == 1) {
+//				JOptionPane
+//						.showMessageDialog(Main.getInstance(),
+//								Language.final_round);
+//				return false;
+//			}
+//
+//			if (getLatestRound().isValid(true) == false) {
+//				JOptionPane
+//						.showMessageDialog(
+//								Main.getInstance(),
+//								Language.round_invalid);
+//				return false;
+//			}
+//
+//			generateSingleEliminationMatches(getLatestRound().getMatches()
+//					.size());
 		} else {
 			// Regular swiss round checks
 			if (getLatestRound().isValid(false) == false) {
@@ -322,8 +335,8 @@ public class XWingTournament implements XMLObject, Tournament {
 			// will be erased.
 			while (rounds.size() >= roundNumber) {
 				int index = rounds.size() - 1;
-				XWingRound roundToRemove = rounds.get(index);
-				for (XWingMatch m : roundToRemove.getMatches()) {
+				MusRound roundToRemove = rounds.get(index);
+				for (MusMatch m : roundToRemove.getMatches()) {
 					m.setWinner(null);
 					m.setBye(false);
 					m.setPlayer1(null);
@@ -347,16 +360,89 @@ public class XWingTournament implements XMLObject, Tournament {
 		}
 
 		cancelRound(roundNumber);
+		
+		if(tournamentType == TournamentTypeEnum.SINGLE || tournamentType == TournamentTypeEnum.DOUBLE || tournamentType == TournamentTypeEnum.TRIPLE){
+			generateEliminationRound(roundNumber);
+		} else {
+			generateSwissRound(roundNumber);
+		}
+		
+		getTournamentGUI().getRankingTable().setPlayers(getAllXWingPlayers());
+	}
+	
+	private void generateEliminationRound(int roundNumber){
+		
+		List<MusMatch> matches = new ArrayList<MusMatch>();
+		
+		if(tournamentType == TournamentTypeEnum.SINGLE){
+			matches = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 0);
+		} else if(tournamentType == TournamentTypeEnum.DOUBLE){
+			matches = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 0);
 
-		List<XWingMatch> matches;
+			List<MusMatch> matches2 = new ArrayList<MusMatch>();			
+			matches2 = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 1);
+			
+			if(matches2.size() == 1 && matches.size() == 1){
+				if(matches2.get(0).isBye() && matches.get(0).isBye()){
+					matches.get(0).setPlayer2(matches2.get(0).getPlayer1());
+					matches.get(0).setBye(false);
+					matches2.clear();
+				}
+			}
+
+			matches.addAll(matches2);
+			
+		} else if(tournamentType == TournamentTypeEnum.TRIPLE){
+			matches = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 0);
+
+			List<MusMatch> matches2 = new ArrayList<MusMatch>();
+			matches2 = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 1);
+
+			List<MusMatch> matches3 = new ArrayList<MusMatch>();
+			matches3 = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 2);
+			
+			if(matches3.size() == 1 && matches2.size() == 1){
+				if(matches3.get(0).isBye() && matches2.get(0).isBye()){
+					matches2.get(0).setPlayer2(matches3.get(0).getPlayer1());
+					matches2.get(0).setBye(false);
+					matches3.clear();
+				}
+			}
+			if(matches2.size() == 1 && matches.size() == 1 && matches3.size() == 0){
+				if(matches2.get(0).isBye() && matches.get(0).isBye()){
+					matches.get(0).setPlayer2(matches2.get(0).getPlayer1());
+					matches.get(0).setBye(false);
+					matches2.clear();
+				}
+			}
+			if(matches3.size() == 1 && matches.size() == 1 && matches2.size() == 0){
+				if(matches3.get(0).isBye() && matches.get(0).isBye()){
+					matches.get(0).setPlayer2(matches3.get(0).getPlayer1());
+					matches.get(0).setBye(false);
+					matches3.clear();
+				}
+			}
+			
+			matches.addAll(matches2);
+			matches.addAll(matches3);
+		}
+		
+		MusRound r = new MusRound(matches, this, roundNumber);
+		r.setSingleElimination(true);
+		rounds.add(r);
+		getTournamentGUI().getRoundTabbedPane().addSwissTab(roundNumber, r.getPanel());;
+	}
+	
+	private void generateSwissRound(int roundNumber){
+		List<MusMatch> matches;
 		if (roundNumber == 1) {
 
-			matches = new ArrayList<XWingMatch>();
-			List<XWingPlayer> tempList = new ArrayList<>();
+			matches = new ArrayList<MusMatch>();
+			List<MusPlayer> tempList = new ArrayList<>();
 			tempList.addAll(getXWingPlayers());
 
-			List<XWingPlayer> firstRoundByePlayers = new ArrayList<>();
-			for (XWingPlayer p : tempList) {
+			List<MusPlayer> firstRoundByePlayers = new ArrayList<>();
+			for (MusPlayer p : tempList) {
 				if (p.isFirstRoundBye()) {
 					firstRoundByePlayers.add(p);
 				}
@@ -366,15 +452,15 @@ public class XWingTournament implements XMLObject, Tournament {
 			if (seedingEnum == InitialSeedingEnum.IN_ORDER) {
 
 				while (tempList.isEmpty() == false) {
-					XWingPlayer player1 = tempList.get(0);
-					XWingPlayer player2 = null;
+					MusPlayer player1 = tempList.get(0);
+					MusPlayer player2 = null;
 					tempList.remove(0);
 					if (tempList.isEmpty() == false) {
 						player2 = tempList.get(0);
 						tempList.remove(0);
 					}
 
-					XWingMatch match = new XWingMatch(player1, player2);
+					MusMatch match = new MusMatch(player1, player2);
 					matches.add(match);
 				}
 
@@ -382,8 +468,8 @@ public class XWingTournament implements XMLObject, Tournament {
 				Collections.shuffle(tempList);
 
 				while (tempList.isEmpty() == false) {
-					XWingPlayer player1 = tempList.get(0);
-					XWingPlayer player2 = tempList.get(tempList.size() - 1);
+					MusPlayer player1 = tempList.get(0);
+					MusPlayer player2 = tempList.get(tempList.size() - 1);
 					tempList.remove(player1);
 					if (player1 == player2) {
 						player2 = null;
@@ -391,15 +477,15 @@ public class XWingTournament implements XMLObject, Tournament {
 						tempList.remove(player2);
 					}
 
-					XWingMatch match = new XWingMatch(player1, player2);
+					MusMatch match = new MusMatch(player1, player2);
 					matches.add(match);
 				}
 			} else if (seedingEnum == InitialSeedingEnum.BY_GROUP) {
-				Map<String, List<XWingPlayer>> playerMap = new HashMap<String, List<XWingPlayer>>();
+				Map<String, List<MusPlayer>> playerMap = new HashMap<String, List<MusPlayer>>();
 
 				// Add players to map
-				for (XWingPlayer p : tempList) {
-					List<XWingPlayer> playerList = playerMap.get(p.getPlayer()
+				for (MusPlayer p : tempList) {
+					List<MusPlayer> playerList = playerMap.get(p.getPlayer()
 							.getGroupName());
 
 					if (playerList == null) {
@@ -417,12 +503,12 @@ public class XWingTournament implements XMLObject, Tournament {
 				Collections.shuffle(seedValues);
 
 				// Shuffle each group list
-				for (List<XWingPlayer> list : playerMap.values()) {
+				for (List<MusPlayer> list : playerMap.values()) {
 					Collections.shuffle(list);
 				}
 
-				XWingPlayer p1 = null;
-				XWingPlayer p2 = null;
+				MusPlayer p1 = null;
+				MusPlayer p2 = null;
 				while (seedValues.isEmpty() == false) {
 					int i = 0;
 					while (i < seedValues.size()) {
@@ -430,7 +516,7 @@ public class XWingTournament implements XMLObject, Tournament {
 							p1 = playerMap.get(seedValues.get(i)).get(0);
 						} else {
 							p2 = playerMap.get(seedValues.get(i)).get(0);
-							matches.add(new XWingMatch(p1, p2));
+							matches.add(new MusMatch(p1, p2));
 							p1 = null;
 							p2 = null;
 						}
@@ -447,50 +533,49 @@ public class XWingTournament implements XMLObject, Tournament {
 					Collections.shuffle(seedValues);
 				}
 				if (p1 != null) {
-					matches.add(new XWingMatch(p1, null));
+					matches.add(new MusMatch(p1, null));
 				}
 			}
 
-			for (XWingPlayer p : firstRoundByePlayers) {
-				matches.add(new XWingMatch(p, null));
+			for (MusPlayer p : firstRoundByePlayers) {
+				matches.add(new MusMatch(p, null));
 			}
 
 		} else {
 
 			matches = getMatches(getXWingPlayers());
 		}
-		XWingRound r = new XWingRound(matches, this, roundNumber);
+		MusRound r = new MusRound(matches, this, roundNumber);
 		rounds.add(r);
 		if (roundNumber == 1
-				&& startAsSingleElimination
+				&& tournamentType == TournamentTypeEnum.SINGLE
 				&& (matches.size() == 1 || matches.size() == 2
 						|| matches.size() == 4 || matches.size() == 8
 						|| matches.size() == 16 || matches.size() == 32)) {
 			r.setSingleElimination(true);
-			getTournamentGUI().getRoundTabbedPane().addSingleEliminationTab(
-					r.getMatches().size() * 2, r.getPanel());
+			getTournamentGUI().getRoundTabbedPane().addSwissTab(
+					roundNumber, r.getPanel());
 		} else {
 			getTournamentGUI().getRoundTabbedPane().addSwissTab(roundNumber,
 					r.getPanel());
 		}
 
-		getTournamentGUI().getRankingTable().setPlayers(getAllXWingPlayers());
 	}
 
-	private List<XWingMatch> getMatches(List<XWingPlayer> userList) {
-		List<XWingMatch> matches = new ArrayList<XWingMatch>();
+	private List<MusMatch> getMatches(List<MusPlayer> userList) {
+		List<MusMatch> matches = new ArrayList<MusMatch>();
 
-		List<XWingPlayer> tempList = new ArrayList<XWingPlayer>();
+		List<MusPlayer> tempList = new ArrayList<MusPlayer>();
 		tempList.addAll(userList);
-		Collections.sort(tempList, new XWingComparator(this,
-				XWingComparator.pairingCompare));
+		Collections.sort(tempList, new MusComparator(this,
+				MusComparator.pairingCompare));
 
-		XWingMatch byeMatch = null;
+		MusMatch byeMatch = null;
 		// Setup the bye match if necessary
 		// The player to get the bye is the lowest ranked player who has not had
 		// a bye yet or who has the fewest byes
 		if (tempList.size() % 2 == 1) {
-			XWingPlayer byeUser = null;
+			MusPlayer byeUser = null;
 			int byUserCounter = 1;
 			int minByes = 0;
 			try {
@@ -512,14 +597,14 @@ public class XWingTournament implements XMLObject, Tournament {
 			} catch (ArrayIndexOutOfBoundsException e) {
 				byeUser = tempList.get(tempList.size() - 1);
 			}
-			byeMatch = new XWingMatch(byeUser, null);
+			byeMatch = new MusMatch(byeUser, null);
 			tempList.remove(byeUser);
 		}
 
-		matches = new XWingRandomMatchGeneration(this, tempList)
+		matches = new MusRandomMatchGeneration(this, tempList)
 				.generateMatches();
 
-		if (XWingMatch.hasDuplicate(matches)) {
+		if (MusMatch.hasDuplicate(matches)) {
 			JOptionPane
 					.showMessageDialog(Main.getInstance(),
 							Language.duplicate_resolution_failure);
@@ -536,15 +621,15 @@ public class XWingTournament implements XMLObject, Tournament {
 	@Override
 	public void generateSingleEliminationMatches(int cutSize) {
 
-		List<XWingMatch> matches = new ArrayList<>();
+		List<MusMatch> matches = new ArrayList<>();
 
-		List<XWingMatch> matchesCorrected = new ArrayList<XWingMatch>();
+		List<MusMatch> matchesCorrected = new ArrayList<MusMatch>();
 
 		if (getLatestRound().isSingleElimination()) {
-			List<XWingMatch> lastRoundMatches = getLatestRound().getMatches();
+			List<MusMatch> lastRoundMatches = getLatestRound().getMatches();
 
 			for (int index = 0; index < lastRoundMatches.size(); index = index + 2) {
-				XWingMatch newMatch = new XWingMatch(lastRoundMatches
+				MusMatch newMatch = new MusMatch(lastRoundMatches
 						.get(index).getWinner(), lastRoundMatches
 						.get(index + 1).getWinner());
 				matches.add(newMatch);
@@ -552,15 +637,15 @@ public class XWingTournament implements XMLObject, Tournament {
 
 			matchesCorrected = matches;
 		} else {
-			List<XWingPlayer> tempList = new ArrayList<>();
+			List<MusPlayer> tempList = new ArrayList<>();
 			tempList.addAll(getXWingPlayers());
-			Collections.sort(tempList, new XWingComparator(this,
-					XWingComparator.rankingCompare));
+			Collections.sort(tempList, new MusComparator(this,
+					MusComparator.rankingCompare));
 			tempList = tempList.subList(0, cutSize);
 
 			while (tempList.isEmpty() == false) {
-				XWingPlayer player1 = tempList.get(0);
-				XWingPlayer player2 = tempList.get(tempList.size() - 1);
+				MusPlayer player1 = tempList.get(0);
+				MusPlayer player2 = tempList.get(tempList.size() - 1);
 				tempList.remove(player1);
 				if (player1 == player2) {
 					player2 = null;
@@ -568,7 +653,7 @@ public class XWingTournament implements XMLObject, Tournament {
 					tempList.remove(player2);
 				}
 
-				XWingMatch match = new XWingMatch(player1, player2);
+				MusMatch match = new MusMatch(player1, player2);
 				matches.add(match);
 			}
 
@@ -594,7 +679,7 @@ public class XWingTournament implements XMLObject, Tournament {
 			}
 		}
 
-		XWingRound r = new XWingRound(matchesCorrected, this, null);
+		MusRound r = new MusRound(matchesCorrected, this, null);
 		r.setSingleElimination(true);
 		rounds.add(r);
 		getTournamentGUI().getRoundTabbedPane().addSingleEliminationTab(
@@ -608,7 +693,7 @@ public class XWingTournament implements XMLObject, Tournament {
 
 		String playerString = "";
 		String seperator = "";
-		for (XWingPlayer p : players) {
+		for (MusPlayer p : players) {
 			playerString += seperator + p.getPlayer().getSaveId();
 			seperator = ",";
 		}
@@ -630,7 +715,8 @@ public class XWingTournament implements XMLObject, Tournament {
 		XMLUtils.appendObject(sb, "POINTS", points);
 		XMLUtils.appendObject(sb, "NAME", name);
 		XMLUtils.appendObject(sb, "MODULE", Modules.XWING.getName());
-
+		XMLUtils.appendObject(sb,  "TOURNAMENTTYPE", tournamentType);
+		
 		return sb;
 	}
 
@@ -642,8 +728,8 @@ public class XWingTournament implements XMLObject, Tournament {
 	@Override
 	public void addPlayer(Player p) {
 		
-		for(XWingRound r : getAllRounds()){
-			for(XWingMatch m : r.getMatches()){
+		for(MusRound r : getAllRounds()){
+			for(MusMatch m : r.getMatches()){
 				if(m.getPlayer1().getPlayer().equals(p)){
 					getXWingPlayers().add(m.getPlayer1());
 					return;
@@ -654,16 +740,16 @@ public class XWingTournament implements XMLObject, Tournament {
 			}
 		}
 		
-		XWingPlayer xPlayer = new XWingPlayer(p);
+		MusPlayer xPlayer = new MusPlayer(p);
 		getXWingPlayers().add(xPlayer);
 	}
 
 	@Override
 	public void dropPlayer(Player p) {
 
-		XWingPlayer xPlayer = null;
+		MusPlayer xPlayer = null;
 
-		for (XWingPlayer xp : getXWingPlayers()) {
+		for (MusPlayer xp : getXWingPlayers()) {
 			if (xp.getPlayer() == p) {
 				xPlayer = xp;
 				break;
@@ -684,7 +770,7 @@ public class XWingTournament implements XMLObject, Tournament {
 
 	@Override
 	public Icon getIcon() {
-		URL imgURL = XWingTournament.class.getResource("x.png");
+		URL imgURL = MusTournament.class.getResource("x.png");
 		if (imgURL == null) {
 			System.out.println("fail!!!!!!!!!!");
 		}
@@ -695,5 +781,9 @@ public class XWingTournament implements XMLObject, Tournament {
 	@Override
 	public String getModuleName() {
 		return Modules.XWING.getName();
+	}
+
+	public boolean isElimination() {
+		return tournamentType == TournamentTypeEnum.SINGLE || tournamentType == TournamentTypeEnum.DOUBLE || tournamentType == TournamentTypeEnum.TRIPLE;
 	}
 }

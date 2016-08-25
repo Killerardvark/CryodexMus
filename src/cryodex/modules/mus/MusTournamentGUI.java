@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.awt.BorderLayout;
 
@@ -8,17 +8,17 @@ import javax.swing.JSplitPane;
 import cryodex.modules.TournamentGUI;
 import cryodex.widget.RoundTabbedPane;
 
-public class XWingTournamentGUI implements TournamentGUI {
+public class MusTournamentGUI implements TournamentGUI {
 
 	private RoundTabbedPane roundTabbedPane;
-	private XWingRankingTable rankingTable;
+	private MusRankingTable rankingTable;
 	private JSplitPane tmentSplitter;
 	private JPanel roundPane;
 	private JPanel rankingPane;
 	private JPanel display;
-	private final XWingTournament tournament;
+	private final MusTournament tournament;
 
-	public XWingTournamentGUI(XWingTournament tournament) {
+	public MusTournamentGUI(MusTournament tournament) {
 		this.tournament = tournament;
 	}
 
@@ -63,9 +63,9 @@ public class XWingTournamentGUI implements TournamentGUI {
 		return rankingPane;
 	}
 
-	public XWingRankingTable getRankingTable() {
+	public MusRankingTable getRankingTable() {
 		if (rankingTable == null) {
-			rankingTable = new XWingRankingTable(tournament);
+			rankingTable = new MusRankingTable(tournament);
 		}
 		return rankingTable;
 	}

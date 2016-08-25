@@ -1,8 +1,8 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import cryodex.modules.TournamentComparator;
 
-public class XWingComparator extends TournamentComparator<XWingPlayer> {
+public class MusComparator extends TournamentComparator<MusPlayer> {
 
 	public static enum CompareOptions {
 		HEAD_TO_HEAD, MARGIN_OF_VICTORY, STRENGH_OF_SCHEDULE, AVERAGE_STRENGTH_OF_SCHEDULE, SCORE, RANDOM, NAME;
@@ -19,16 +19,16 @@ public class XWingComparator extends TournamentComparator<XWingPlayer> {
 			CompareOptions.SCORE, CompareOptions.MARGIN_OF_VICTORY,
 			CompareOptions.AVERAGE_STRENGTH_OF_SCHEDULE, CompareOptions.RANDOM };
 
-	private final XWingTournament t;
+	private final MusTournament t;
 	private final CompareOptions[] sortOrder;
 
-	public XWingComparator(XWingTournament t, CompareOptions[] sortOrder) {
+	public MusComparator(MusTournament t, CompareOptions[] sortOrder) {
 		this.t = t;
 		this.sortOrder = sortOrder;
 	}
 
 	@Override
-	public int compare(XWingPlayer o1, XWingPlayer o2) {
+	public int compare(MusPlayer o1, MusPlayer o2) {
 
 		int result = 0;
 
@@ -41,7 +41,7 @@ public class XWingComparator extends TournamentComparator<XWingPlayer> {
 		return result;
 	}
 
-	private int compareOption(XWingPlayer o1, XWingPlayer o2,
+	private int compareOption(MusPlayer o1, MusPlayer o2,
 			CompareOptions option) {
 
 		int result = 0;

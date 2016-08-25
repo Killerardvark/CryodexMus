@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -27,11 +27,11 @@ import cryodex.CryodexController.Modules;
 import cryodex.Main;
 import cryodex.Player;
 import cryodex.modules.Menu;
-import cryodex.modules.xwing.export.XWingExportController;
+import cryodex.modules.mus.export.XWingExportController;
 import cryodex.widget.ComponentUtils;
 
 @SuppressWarnings("serial")
-public class XWingMenu implements Menu {
+public class MusMenu implements Menu {
 
 	private JMenu mainMenu;
 
@@ -62,7 +62,7 @@ public class XWingMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					Main.getInstance().setExtendedState(Frame.MAXIMIZED_BOTH);
-					XWingModule.createTournament();
+					MusModule.createTournament();
 				}
 			});
 
@@ -91,25 +91,25 @@ public class XWingMenu implements Menu {
 			viewMenu = new JMenu(Language.view);
 
 			showKillPoints = new JCheckBoxMenuItem(Language.show_points);
-			showKillPoints.setSelected(XWingModule.getInstance().getOptions()
+			showKillPoints.setSelected(MusModule.getInstance().getOptions()
 					.isShowKillPoints());
 			showKillPoints.addItemListener(new ItemListener() {
 
 				@Override
 				public void itemStateChanged(ItemEvent e) {
-					XWingModule.getInstance().getOptions()
+					MusModule.getInstance().getOptions()
 							.setShowKillPoints(showKillPoints.isSelected());
 				}
 			});
 
 			onlyEnterPoints = new JCheckBoxMenuItem(Language.only_enter_points);
-			onlyEnterPoints.setSelected(XWingModule.getInstance().getOptions()
+			onlyEnterPoints.setSelected(MusModule.getInstance().getOptions()
 					.isEnterOnlyPoints());
 			onlyEnterPoints.addItemListener(new ItemListener() {
 
 				@Override
 				public void itemStateChanged(ItemEvent e) {
-					XWingModule.getInstance().getOptions()
+					MusModule.getInstance().getOptions()
 							.setEnterOnlyPoints(onlyEnterPoints.isSelected());
 				}
 			});
@@ -211,7 +211,7 @@ public class XWingMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					XWingTournament tournament = (XWingTournament) CryodexController
+					MusTournament tournament = (MusTournament) CryodexController
 							.getActiveTournament();
 
 					int index = tournament.getTournamentGUI()
@@ -222,7 +222,7 @@ public class XWingMenu implements Menu {
 							Language.round_regen_warning);
 
 					if (result == JOptionPane.OK_OPTION) {
-						XWingRound r = tournament.getRound(index);
+						MusRound r = tournament.getRound(index);
 						if (r.isSingleElimination()) {
 							int playerCount = r.getMatches().size() * 2;
 							tournament.cancelRound(tournament.getRoundNumber(r));
@@ -247,7 +247,7 @@ public class XWingMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					XWingTournament tournament = (XWingTournament) CryodexController
+					MusTournament tournament = (MusTournament) CryodexController
 							.getActiveTournament();
 
 					int index = tournament.getTournamentGUI()
@@ -281,7 +281,7 @@ public class XWingMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					XWingTournament tournament = (XWingTournament) CryodexController
+					MusTournament tournament = (MusTournament) CryodexController
 							.getActiveTournament();
 
 					if (tournament.getSelectedRound().isComplete()) {
@@ -290,7 +290,7 @@ public class XWingMenu implements Menu {
 						return;
 					}
 
-					XWingSwapPanel.showSwapPanel();
+					MusSwapPanel.showSwapPanel();
 				}
 			});
 
@@ -309,7 +309,7 @@ public class XWingMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 
-					XWingTournament tournament = (XWingTournament) CryodexController
+					MusTournament tournament = (MusTournament) CryodexController
 							.getActiveTournament();
 
 					if (tournament.getLatestRound().isComplete() == false) {
@@ -356,9 +356,9 @@ public class XWingMenu implements Menu {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					XWingTournament tournament = (XWingTournament) CryodexController
+					MusTournament tournament = (MusTournament) CryodexController
 							.getActiveTournament();
-					XWingRound round = tournament.getLatestRound();
+					MusRound round = tournament.getLatestRound();
 
 					int roundNumber = round.isSingleElimination() ? 0
 							: tournament.getRoundNumber(round);
@@ -374,9 +374,9 @@ public class XWingMenu implements Menu {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					XWingTournament tournament = (XWingTournament) CryodexController
+					MusTournament tournament = (MusTournament) CryodexController
 							.getActiveTournament();
-					XWingRound round = tournament.getLatestRound();
+					MusRound round = tournament.getLatestRound();
 
 					int roundNumber = round.isSingleElimination() ? 0
 							: tournament.getRoundNumber(round);
@@ -392,7 +392,7 @@ public class XWingMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					XWingExportController
-							.exportRankings((XWingTournament) CryodexController
+							.exportRankings((MusTournament) CryodexController
 									.getActiveTournament());
 				}
 			});
@@ -404,7 +404,7 @@ public class XWingMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					XWingExportController
-							.exportTournamentReport((XWingTournament) CryodexController
+							.exportTournamentReport((MusTournament) CryodexController
 									.getActiveTournament());
 				}
 			});
@@ -423,11 +423,11 @@ public class XWingMenu implements Menu {
 	public void resetMenuBar() {
 
 		boolean isXWingTournament = CryodexController.getActiveTournament() != null
-				&& CryodexController.getActiveTournament() instanceof XWingTournament;
+				&& CryodexController.getActiveTournament() instanceof MusTournament;
 
-		showKillPoints.setSelected(XWingModule.getInstance().getOptions()
+		showKillPoints.setSelected(MusModule.getInstance().getOptions()
 				.isShowKillPoints());
-		onlyEnterPoints.setSelected(XWingModule.getInstance().getOptions()
+		onlyEnterPoints.setSelected(MusModule.getInstance().getOptions()
 				.isEnterOnlyPoints());
 
 		deleteTournament.setEnabled(isXWingTournament);
@@ -436,7 +436,7 @@ public class XWingMenu implements Menu {
 		getExportMenu().setEnabled(isXWingTournament);
 
 		if (isXWingTournament) {
-			boolean isSingleElimination = ((XWingTournament) CryodexController
+			boolean isSingleElimination = ((MusTournament) CryodexController
 					.getActiveTournament()).getLatestRound()
 					.isSingleElimination();
 			getCutPlayers().setEnabled(!isSingleElimination);

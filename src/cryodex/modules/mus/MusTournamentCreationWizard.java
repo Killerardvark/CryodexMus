@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -29,12 +29,13 @@ import cryodex.Language;
 import cryodex.Main;
 import cryodex.Player;
 import cryodex.modules.Tournament;
-import cryodex.modules.xwing.XWingTournament.InitialSeedingEnum;
+import cryodex.modules.mus.MusTournament.InitialSeedingEnum;
+import cryodex.modules.mus.MusTournament.TournamentTypeEnum;
 import cryodex.widget.ComponentUtils;
 import cryodex.widget.DoubleList;
 import cryodex.widget.SpringUtilities;
 
-public class XWingTournamentCreationWizard extends JDialog {
+public class MusTournamentCreationWizard extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -51,12 +52,12 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 	private final List<Page> pages = new ArrayList<Page>();
 
-	public XWingTournamentCreationWizard() {
+	public MusTournamentCreationWizard() {
 		super(Main.getInstance(), Language.tournament_wizard, true);
 
 		this.add(getMainPanel());
 		setCurrentPage(new MainPage());
-		XWingTournamentCreationWizard.this.pack();
+		MusTournamentCreationWizard.this.pack();
 		this.setMinimumSize(new Dimension(450, 300));
 	}
 
@@ -88,7 +89,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 			getContentPanel().validate();
 			getContentPanel().repaint();
 		} else {
-			XWingTournamentCreationWizard.this.setVisible(false);
+			MusTournamentCreationWizard.this.setVisible(false);
 		}
 	}
 
@@ -188,7 +189,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					XWingTournamentCreationWizard.this.setVisible(false);
+					MusTournamentCreationWizard.this.setVisible(false);
 				}
 			});
 		}
@@ -222,7 +223,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 			setButtonVisibility(null, true, null);
 			
-			XWingTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 300));
+			MusTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 300));
 
 			if (pagePanel == null) {
 				JPanel namePanel = new JPanel(new BorderLayout());
@@ -327,7 +328,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 			setButtonVisibility(true, true, null);
 			
-			XWingTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 500));
+			MusTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 500));
 
 			if (pagePanel == null) {
 
@@ -393,9 +394,9 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 		@Override
 		public void onNext() {
-			List<XWingPlayer> xwingPlayerList = new ArrayList<>();
+			List<MusPlayer> xwingPlayerList = new ArrayList<>();
 			for (Player p : playerList.getList2Values()) {
-				xwingPlayerList.add((XWingPlayer) p
+				xwingPlayerList.add((MusPlayer) p
 						.getModuleInfoByModule(Modules.XWING.getModule()));
 			}
 			wizardOptions.setPlayerList(xwingPlayerList);
@@ -420,6 +421,8 @@ public class XWingTournamentCreationWizard extends JDialog {
 		private JRadioButton byGroupRB;
 		private JRadioButton byRankingRB;
 		private JCheckBox singleElimination;
+		private JCheckBox doubleElimination;
+		private JCheckBox tripleElimination;
 
 		private JTextField customPointsTF;
 		private JRadioButton standardRB;
@@ -438,7 +441,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 			setButtonVisibility(true, null, true);
 			
-			XWingTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 500));
+			MusTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 500));
 
 			if (pagePanel == null) {
 
@@ -460,6 +463,10 @@ public class XWingTournamentCreationWizard extends JDialog {
 				byRankingRB = new JRadioButton(Language.by_ranking);
 				singleElimination = new JCheckBox(
 						"<HTML>" + Language.start_as_single_elimination + "</HTML>");
+				doubleElimination = new JCheckBox(
+						"<HTML>" + Language.start_as_double_elimination + "</HTML>");
+				tripleElimination = new JCheckBox(
+						"<HTML>" + Language.start_as_triple_elimination + "</HTML>");
 
 				bg.add(randomRB);
 				bg.add(byGroupRB);
@@ -474,6 +481,8 @@ public class XWingTournamentCreationWizard extends JDialog {
 					tournamentTypesPanel.add(byRankingRB);
 				}
 				tournamentTypesPanel.add(singleElimination);
+				tournamentTypesPanel.add(doubleElimination);
+				tournamentTypesPanel.add(tripleElimination);
 
 				SpringUtilities
 						.makeCompactGrid(tournamentTypesPanel,
@@ -575,7 +584,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 				if (wizardOptions.getSelectedTournaments() != null
 						&& wizardOptions.getSelectedTournaments().isEmpty() == false) {
 					splitOptionsSubPanel.add(splitByRanking);
-					XWingTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 550));
+					MusTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 550));
 				}
 
 				SpringUtilities
@@ -649,7 +658,13 @@ public class XWingTournamentCreationWizard extends JDialog {
 			}
 
 			if (singleElimination.isSelected()) {
-				wizardOptions.setSingleElimination(true);
+				wizardOptions.setTournamentType(TournamentTypeEnum.SINGLE);
+			}
+			if (doubleElimination.isSelected()) {
+				wizardOptions.setTournamentType(TournamentTypeEnum.DOUBLE);
+			}
+			if (tripleElimination.isSelected()) {
+				wizardOptions.setTournamentType(TournamentTypeEnum.TRIPLE);
 			}
 
 			boolean fixByes = true;
@@ -666,15 +681,15 @@ public class XWingTournamentCreationWizard extends JDialog {
 					wizardOptionsList.add(newWizardOption);
 
 					newWizardOption.setName(wizardOptions.getName() + " " + i);
-					newWizardOption.setPlayerList(new ArrayList<XWingPlayer>());
+					newWizardOption.setPlayerList(new ArrayList<MusPlayer>());
 				}
 
 				if (splitByGroupRB.isSelected()) {
-					Map<String, List<XWingPlayer>> playerMap = new HashMap<String, List<XWingPlayer>>();
+					Map<String, List<MusPlayer>> playerMap = new HashMap<String, List<MusPlayer>>();
 
 					// Add players to map
-					for (XWingPlayer p : wizardOptions.getPlayerList()) {
-						List<XWingPlayer> playerList = playerMap.get(p
+					for (MusPlayer p : wizardOptions.getPlayerList()) {
+						List<MusPlayer> playerList = playerMap.get(p
 								.getPlayer().getGroupName());
 
 						if (playerList == null) {
@@ -690,7 +705,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 					int j = 0;
 					for (String groupValue : playerMap.keySet()) {
 
-						List<XWingPlayer> playerList = playerMap
+						List<MusPlayer> playerList = playerMap
 								.get(groupValue);
 
 						while (playerList.isEmpty() == false) {
@@ -716,7 +731,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 										.getPlayerList().size() % 2 == 1
 										&& wizardOptionsList.get(last)
 												.getPlayerList().size() % 2 == 1) {
-									XWingPlayer p = wizardOptionsList
+									MusPlayer p = wizardOptionsList
 											.get(first)
 											.getPlayerList()
 											.get(wizardOptionsList.get(first)
@@ -733,7 +748,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 						}
 					}
 				} else if (splitByRanking.isSelected()) {
-					List<XWingPlayer> tempPlayers = rankMergedPlayers(wizardOptions
+					List<MusPlayer> tempPlayers = rankMergedPlayers(wizardOptions
 							.getPlayerList());
 
 					int ppt = tempPlayers.size() / splitNum;
@@ -757,13 +772,13 @@ public class XWingTournamentCreationWizard extends JDialog {
 										.size() % 2 == 1 || wizardOptionsList
 										.get(i).getPlayerList().size() > wizardOptionsList
 										.get(i + 1).getPlayerList().size())) {
-							XWingPlayer t1 = wizardOptionsList
+							MusPlayer t1 = wizardOptionsList
 									.get(i)
 									.getPlayerList()
 									.get(wizardOptionsList.get(i)
 											.getPlayerList().size() - 1);
 							wizardOptionsList.get(i).getPlayerList().remove(t1);
-							List<XWingPlayer> temp = new ArrayList<XWingPlayer>();
+							List<MusPlayer> temp = new ArrayList<MusPlayer>();
 							temp.addAll(wizardOptionsList.get(i + 1)
 									.getPlayerList());
 							wizardOptionsList.get(i + 1).getPlayerList()
@@ -776,7 +791,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 					}
 				} else {
-					List<XWingPlayer> playerList = wizardOptions
+					List<MusPlayer> playerList = wizardOptions
 							.getPlayerList();
 					Collections.shuffle(playerList);
 					int j = 0;
@@ -802,7 +817,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 										.getPlayerList().size() % 2 == 1
 										&& wizardOptionsList.get(last)
 												.getPlayerList().size() % 2 == 1) {
-									XWingPlayer p = wizardOptionsList
+									MusPlayer p = wizardOptionsList
 											.get(first)
 											.getPlayerList()
 											.get(wizardOptionsList.get(first)
@@ -820,19 +835,19 @@ public class XWingTournamentCreationWizard extends JDialog {
 					}
 				}
 
-				XWingTournamentCreationWizard.this.setVisible(false);
+				MusTournamentCreationWizard.this.setVisible(false);
 
 				for (WizardOptions wo : wizardOptionsList) {
 					if (wo.getInitialSeedingEnum() == InitialSeedingEnum.IN_ORDER) {
-						List<XWingPlayer> tempList = rankMergedPlayers(wo
+						List<MusPlayer> tempList = rankMergedPlayers(wo
 								.getPlayerList());
 						wo.setPlayerList(tempList);
 					}
-					XWingModule.makeTournament(wo);
+					MusModule.makeTournament(wo);
 				}
 			} else {
-				XWingTournamentCreationWizard.this.setVisible(false);
-				XWingModule.makeTournament(wizardOptions);
+				MusTournamentCreationWizard.this.setVisible(false);
+				MusModule.makeTournament(wizardOptions);
 			}
 		}
 	}
@@ -840,7 +855,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 	private class MergeTournamentSelectionPage implements Page {
 
 		private JPanel pagePanel = null;
-		private final Map<XWingTournament, JCheckBox> checkBoxMap = new HashMap<XWingTournament, JCheckBox>();
+		private final Map<MusTournament, JCheckBox> checkBoxMap = new HashMap<MusTournament, JCheckBox>();
 		private JRadioButton all;
 		private JRadioButton manual;
 		private JTextField manualInput;
@@ -850,7 +865,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 			
 			setButtonVisibility(true, true, false);
 
-			XWingTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 500));
+			MusTournamentCreationWizard.this.setMinimumSize(new Dimension(450, 500));
 			
 			if (pagePanel == null) {
 				pagePanel = new JPanel(new BorderLayout());
@@ -862,8 +877,8 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 				for (Tournament t : CryodexController.getAllTournaments()) {
 					JCheckBox cb = new JCheckBox(t.getName());
-					if (t instanceof XWingTournament) {
-						checkBoxMap.put((XWingTournament) t, cb);
+					if (t instanceof MusTournament) {
+						checkBoxMap.put((MusTournament) t, cb);
 					}
 
 					listPanel.add(cb);
@@ -920,19 +935,19 @@ public class XWingTournamentCreationWizard extends JDialog {
 		@Override
 		public void onNext() {
 			wizardOptions.setMerge(true);
-			List<XWingTournament> tournamentList = new ArrayList<XWingTournament>();
-			Set<XWingPlayer> playerList = new TreeSet<XWingPlayer>();
+			List<MusTournament> tournamentList = new ArrayList<MusTournament>();
+			Set<MusPlayer> playerList = new TreeSet<MusPlayer>();
 			Integer playerCount = null;
 
 			if (manual.isSelected()) {
 				playerCount = Integer.parseInt(manualInput.getText());
 			}
 
-			for (XWingTournament t : checkBoxMap.keySet()) {
+			for (MusTournament t : checkBoxMap.keySet()) {
 				if (checkBoxMap.get(t).isSelected()) {
 
 					tournamentList.add(t);
-					List<XWingPlayer> thisTournamentPlayers = new ArrayList<XWingPlayer>();
+					List<MusPlayer> thisTournamentPlayers = new ArrayList<MusPlayer>();
 					thisTournamentPlayers.addAll(t.getXWingPlayers());
 
 					if (playerCount == null
@@ -940,8 +955,8 @@ public class XWingTournamentCreationWizard extends JDialog {
 						playerList.addAll(thisTournamentPlayers);
 					} else {
 						Collections.sort(thisTournamentPlayers,
-								new XWingComparator(t,
-										XWingComparator.rankingCompare));
+								new MusComparator(t,
+										MusComparator.rankingCompare));
 						playerList.addAll(thisTournamentPlayers.subList(0,
 								playerCount));
 					}
@@ -949,7 +964,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 			}
 
 			Integer points = null;
-			for (XWingTournament t : tournamentList) {
+			for (MusTournament t : tournamentList) {
 				if (points == null) {
 					points = t.getPoints();
 				} else if (points.equals(t.getPoints()) == false) {
@@ -958,7 +973,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 				}
 			}
 
-			List<XWingPlayer> addingList = new ArrayList<XWingPlayer>();
+			List<MusPlayer> addingList = new ArrayList<MusPlayer>();
 			addingList.addAll(playerList);
 			wizardOptions.setPlayerList(addingList);
 			wizardOptions.setSelectedTournaments(tournamentList);
@@ -982,13 +997,13 @@ public class XWingTournamentCreationWizard extends JDialog {
 
 		private String name;
 		private InitialSeedingEnum initialSeedingEnum;
-		private List<XWingPlayer> playerList;
+		private List<MusPlayer> playerList;
 		private Integer points;
 		private List<Integer> escalationPoints;
 		private int split = 1;
 		private boolean isMerge = false;
-		private List<XWingTournament> selectedTournaments;
-		private boolean isSingleElimination = false;
+		private List<MusTournament> selectedTournaments;
+		private TournamentTypeEnum tournamentType = TournamentTypeEnum.SWISS;
 
 		public WizardOptions() {
 
@@ -999,7 +1014,7 @@ public class XWingTournamentCreationWizard extends JDialog {
 			this.initialSeedingEnum = wizardOptions.getInitialSeedingEnum();
 			this.points = wizardOptions.getPoints();
 			this.escalationPoints = wizardOptions.getEscalationPoints();
-			this.isSingleElimination = wizardOptions.isSingleElimination();
+			this.tournamentType = wizardOptions.getTournamentType();
 		}
 
 		public InitialSeedingEnum getInitialSeedingEnum() {
@@ -1010,11 +1025,11 @@ public class XWingTournamentCreationWizard extends JDialog {
 			this.initialSeedingEnum = initialSeedingEnum;
 		}
 
-		public List<XWingPlayer> getPlayerList() {
+		public List<MusPlayer> getPlayerList() {
 			return playerList;
 		}
 
-		public void setPlayerList(List<XWingPlayer> playerList) {
+		public void setPlayerList(List<MusPlayer> playerList) {
 			this.playerList = playerList;
 		}
 
@@ -1060,38 +1075,38 @@ public class XWingTournamentCreationWizard extends JDialog {
 			this.isMerge = isMerge;
 		}
 
-		public List<XWingTournament> getSelectedTournaments() {
+		public List<MusTournament> getSelectedTournaments() {
 			return selectedTournaments;
 		}
 
 		public void setSelectedTournaments(
-				List<XWingTournament> selectedTournaments) {
+				List<MusTournament> selectedTournaments) {
 			this.selectedTournaments = selectedTournaments;
 		}
 
-		public boolean isSingleElimination() {
-			return isSingleElimination;
+		public TournamentTypeEnum getTournamentType() {
+			return tournamentType;
 		}
 
-		public void setSingleElimination(boolean isSingleElimination) {
-			this.isSingleElimination = isSingleElimination;
+		public void setTournamentType(TournamentTypeEnum tournamentType) {
+			this.tournamentType = tournamentType;
 		}
 	}
 
-	public List<XWingPlayer> rankMergedPlayers(List<XWingPlayer> playerList) {
-		XWingTournament mergeTournament = new XWingTournament("",
+	public List<MusPlayer> rankMergedPlayers(List<MusPlayer> playerList) {
+		MusTournament mergeTournament = new MusTournament("",
 				wizardOptions.getPlayerList(), null, wizardOptions
 						.getSelectedTournaments().get(0).getPoints(),
 				wizardOptions.getSelectedTournaments().get(0)
-						.getEscalationPoints(), false);
-		for (XWingTournament t : wizardOptions.getSelectedTournaments()) {
+						.getEscalationPoints(), TournamentTypeEnum.SWISS);
+		for (MusTournament t : wizardOptions.getSelectedTournaments()) {
 			mergeTournament.getAllRounds().addAll(t.getAllRounds());
 		}
 
-		List<XWingPlayer> tempPlayers = new ArrayList<XWingPlayer>();
+		List<MusPlayer> tempPlayers = new ArrayList<MusPlayer>();
 		tempPlayers.addAll(playerList);
-		Collections.sort(tempPlayers, new XWingComparator(mergeTournament,
-				XWingComparator.rankingCompare));
+		Collections.sort(tempPlayers, new MusComparator(mergeTournament,
+				MusComparator.rankingCompare));
 		return tempPlayers;
 	}
 }

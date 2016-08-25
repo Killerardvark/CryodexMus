@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -12,36 +12,36 @@ import cryodex.modules.Module;
 import cryodex.modules.ModulePlayer;
 import cryodex.modules.RegistrationPanel;
 import cryodex.modules.Tournament;
-import cryodex.modules.xwing.XWingTournamentCreationWizard.WizardOptions;
+import cryodex.modules.mus.MusTournamentCreationWizard.WizardOptions;
 import cryodex.xml.XMLUtils;
 import cryodex.xml.XMLUtils.Element;
 
-public class XWingModule implements Module {
+public class MusModule implements Module {
 
-	private static XWingModule module;
+	private static MusModule module;
 
-	public static XWingModule getInstance() {
+	public static MusModule getInstance() {
 		if (module == null) {
-			module = new XWingModule();
+			module = new MusModule();
 		}
 
 		return module;
 	}
 
 	private JCheckBoxMenuItem viewMenuItem;
-	private XWingMenu menu;
-	private XWingOptions options;
+	private MusMenu menu;
+	private MusOptions options;
 
 	private boolean isEnabled = true;
 
-	private XWingModule() {
+	private MusModule() {
 
 	}
 
 	@Override
 	public Menu getMenu() {
 		if (menu == null) {
-			menu = new XWingMenu();
+			menu = new MusMenu();
 		}
 		return menu;
 	}
@@ -65,18 +65,18 @@ public class XWingModule implements Module {
 	}
 
 	public static void createTournament() {
-		JDialog wizard = new XWingTournamentCreationWizard();
+		JDialog wizard = new MusTournamentCreationWizard();
 		wizard.setVisible(true);
 
 	}
 
 	public static void makeTournament(WizardOptions wizardOptions) {
 
-		XWingTournament tournament = new XWingTournament(
+		MusTournament tournament = new MusTournament(
 				wizardOptions.getName(), wizardOptions.getPlayerList(),
 				wizardOptions.getInitialSeedingEnum(),
 				wizardOptions.getPoints(), wizardOptions.getEscalationPoints(),
-				wizardOptions.isSingleElimination());
+				wizardOptions.getTournamentType());
 
 		CryodexController.registerTournament(tournament);
 
@@ -87,9 +87,9 @@ public class XWingModule implements Module {
 		CryodexController.saveData();
 	}
 
-	public XWingOptions getOptions() {
+	public MusOptions getOptions() {
 		if (options == null) {
-			options = new XWingOptions();
+			options = new MusOptions();
 		}
 		return options;
 	}
@@ -103,22 +103,22 @@ public class XWingModule implements Module {
 
 	@Override
 	public ModulePlayer loadPlayer(Player p, Element element) {
-		return new XWingPlayer(p, element);
+		return new MusPlayer(p, element);
 	}
 
 	@Override
 	public Tournament loadTournament(Element element) {
-		return new XWingTournament(element);
+		return new MusTournament(element);
 	}
 
 	@Override
 	public void loadModuleData(Element element) {
-		options = new XWingOptions(element.getChild("OPTIONS"));
+		options = new MusOptions(element.getChild("OPTIONS"));
 	}
 
 	@Override
 	public ModulePlayer getNewModulePlayer(Player player) {
-		return new XWingPlayer(player);
+		return new MusPlayer(player);
 	}
 
 	@Override

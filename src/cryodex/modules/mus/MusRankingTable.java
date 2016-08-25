@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -20,17 +20,17 @@ import cryodex.Language;
 import cryodex.widget.ComponentUtils;
 import cryodex.widget.TimerPanel;
 
-public class XWingRankingTable extends JPanel {
+public class MusRankingTable extends JPanel {
 
 	private static final long serialVersionUID = 5587297504827909147L;
 
 	private JTable table;
 	private RankingTableModel model;
-	private final XWingTournament tournament;
+	private final MusTournament tournament;
 	private JLabel title;
 	private JLabel statsLabel;
 
-	public XWingRankingTable(XWingTournament tournament) {
+	public MusRankingTable(MusTournament tournament) {
 		super(new BorderLayout());
 		JScrollPane scrollPane = new JScrollPane(getTable());
 		ComponentUtils.forceSize(this, 400, 300);
@@ -107,18 +107,18 @@ public class XWingRankingTable extends JPanel {
 
 	private RankingTableModel getTableModel() {
 		if (model == null) {
-			model = new RankingTableModel(new ArrayList<XWingPlayer>());
+			model = new RankingTableModel(new ArrayList<MusPlayer>());
 		}
 		return model;
 	}
 
-	public void setPlayers(Set<XWingPlayer> players) {
+	public void setPlayers(Set<MusPlayer> players) {
 
-		List<XWingPlayer> playerList = new ArrayList<XWingPlayer>();
+		List<MusPlayer> playerList = new ArrayList<MusPlayer>();
 		playerList.addAll(players);
 
-		Collections.sort(playerList, new XWingComparator(tournament,
-				XWingComparator.rankingCompare));
+		Collections.sort(playerList, new MusComparator(tournament,
+				MusComparator.rankingCompare));
 
 		if (this.isVisible() == false) {
 			this.setVisible(true);
@@ -170,23 +170,23 @@ public class XWingRankingTable extends JPanel {
 
 		private static final long serialVersionUID = -1591431777250055477L;
 
-		private List<XWingPlayer> data;
+		private List<MusPlayer> data;
 
-		public RankingTableModel(List<XWingPlayer> data) {
+		public RankingTableModel(List<MusPlayer> data) {
 			setData(data);
 		}
 
 		public void resetData() {
-			Collections.sort(data, new XWingComparator(tournament,
-					XWingComparator.rankingCompare));
+			Collections.sort(data, new MusComparator(tournament,
+					MusComparator.rankingCompare));
 			this.fireTableDataChanged();
 		}
 
-		public void setData(List<XWingPlayer> data) {
+		public void setData(List<MusPlayer> data) {
 			this.data = data;
 
-			Collections.sort(data, new XWingComparator(tournament,
-					XWingComparator.rankingCompare));
+			Collections.sort(data, new MusComparator(tournament,
+					MusComparator.rankingCompare));
 			this.fireTableDataChanged();
 		}
 		
@@ -230,7 +230,7 @@ public class XWingRankingTable extends JPanel {
 
 		@Override
 		public Object getValueAt(int arg0, int arg1) {
-			XWingPlayer user = data.get(arg0);
+			MusPlayer user = data.get(arg0);
 			Object value = null;
 			switch (arg1) {
 			case 0:

@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -30,14 +30,14 @@ import cryodex.Player;
 import cryodex.widget.ComponentUtils;
 
 @SuppressWarnings("serial")
-public class XWingSwapPanel extends JPanel {
+public class MusSwapPanel extends JPanel {
 
 	public static void showSwapPanel() {
 		JDialog manualModificationPanel = new JDialog(Main.getInstance(),
 				Language.swap_players, true);
 		JPanel panel = new JPanel(new BorderLayout());
 		manualModificationPanel.getContentPane().add(panel);
-		panel.add(new XWingSwapPanel(manualModificationPanel),
+		panel.add(new MusSwapPanel(manualModificationPanel),
 				BorderLayout.CENTER);
 		manualModificationPanel.setPreferredSize(new Dimension(450, 600));
 		manualModificationPanel.pack();
@@ -49,9 +49,9 @@ public class XWingSwapPanel extends JPanel {
 	private JButton addButton;
 	private JButton closeButton;
 
-	private final XWingPlayer blankPlayer = new XWingPlayer(new Player());
+	private final MusPlayer blankPlayer = new MusPlayer(new Player());
 
-	private final List<XWingMatch> matches;
+	private final List<MusMatch> matches;
 
 	private final List<MatchPanel> matchPanels;
 	private MatchPanel quickEntryMatch = null;
@@ -60,18 +60,18 @@ public class XWingSwapPanel extends JPanel {
 	private JPanel quickEntryPanel;
 	private JPanel quickEntrySubPanel;
 	private JTextField roundNumber;
-	private JComboBox<XWingPlayer> playerCombo;
+	private JComboBox<MusPlayer> playerCombo;
 
 	private boolean updating = false;
 	private final JDialog parent;
 
-	public XWingSwapPanel(JDialog parent) {
+	public MusSwapPanel(JDialog parent) {
 		super(new BorderLayout());
 
 		this.parent = parent;
 
 		matches = new ArrayList<>();
-		matches.addAll(((XWingTournament) CryodexController
+		matches.addAll(((MusTournament) CryodexController
 				.getActiveTournament()).getSelectedRound().getMatches());
 
 		matchPanels = new ArrayList<>();
@@ -138,16 +138,16 @@ public class XWingSwapPanel extends JPanel {
 						}
 					});
 
-			List<XWingPlayer> playerList = new ArrayList<XWingPlayer>();
+			List<MusPlayer> playerList = new ArrayList<MusPlayer>();
 
-			playerList.add(new XWingPlayer(new Player()));
-			playerList.addAll(((XWingTournament) CryodexController
+			playerList.add(new MusPlayer(new Player()));
+			playerList.addAll(((MusTournament) CryodexController
 					.getActiveTournament()).getXWingPlayers());
 
 			Collections.sort(playerList);
 
-			playerCombo = new JComboBox<XWingPlayer>(
-					playerList.toArray(new XWingPlayer[playerList.size()]));
+			playerCombo = new JComboBox<MusPlayer>(
+					playerList.toArray(new MusPlayer[playerList.size()]));
 
 			playerCombo.addActionListener(new ActionListener() {
 
@@ -179,8 +179,8 @@ public class XWingSwapPanel extends JPanel {
 
 		}
 
-		XWingPlayer player = playerCombo.getSelectedIndex() == 0 ? null
-				: (XWingPlayer) playerCombo.getSelectedItem();
+		MusPlayer player = playerCombo.getSelectedIndex() == 0 ? null
+				: (MusPlayer) playerCombo.getSelectedItem();
 
 		if (player != null) {
 			roundNumber.setEnabled(false);
@@ -233,10 +233,10 @@ public class XWingSwapPanel extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					XWingTournament tournament = (XWingTournament) CryodexController
+					MusTournament tournament = (MusTournament) CryodexController
 							.getActiveTournament();
 
-					List<XWingMatch> matches = new ArrayList<XWingMatch>();
+					List<MusMatch> matches = new ArrayList<MusMatch>();
 
 					boolean isSingleElimination = tournament.getLatestRound()
 							.isSingleElimination();
@@ -246,7 +246,7 @@ public class XWingSwapPanel extends JPanel {
 					tournament.cancelRound(roundNumber);
 
 					for (MatchPanel mp : matchPanels) {
-						XWingMatch m = mp.getNewMatch();
+						MusMatch m = mp.getNewMatch();
 
 						if (m != null) {
 							m.checkDuplicate(tournament.getAllRounds());
@@ -254,12 +254,12 @@ public class XWingSwapPanel extends JPanel {
 						}
 					}
 
-					XWingRound r = new XWingRound(matches, tournament,
+					MusRound r = new MusRound(matches, tournament,
 							roundNumber);
 					r.setSingleElimination(isSingleElimination);
 
 					tournament.getAllRounds().add(r);
-					if (isSingleElimination) {
+					if (r.isSingleElimination() && tournament.isElimination() == false) {
 						tournament
 								.getTournamentGUI()
 								.getRoundTabbedPane()
@@ -286,7 +286,7 @@ public class XWingSwapPanel extends JPanel {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					MatchPanel mp = new MatchPanel(new XWingMatch(),
+					MatchPanel mp = new MatchPanel(new MusMatch(),
 							matchPanels.size());
 
 					matchPanels.add(mp);
@@ -350,8 +350,8 @@ public class XWingSwapPanel extends JPanel {
 
 		updating = true;
 
-		List<XWingPlayer> tempPlayers = new ArrayList<>();
-		tempPlayers.addAll(((XWingTournament) CryodexController
+		List<MusPlayer> tempPlayers = new ArrayList<>();
+		tempPlayers.addAll(((MusTournament) CryodexController
 				.getActiveTournament()).getXWingPlayers());
 
 		for (MatchPanel mp : matchPanels) {
@@ -368,12 +368,12 @@ public class XWingSwapPanel extends JPanel {
 
 	private class MatchPanel extends JPanel {
 
-		private JComboBox<XWingPlayer> player1Combo;
-		private JComboBox<XWingPlayer> player2Combo;
+		private JComboBox<MusPlayer> player1Combo;
+		private JComboBox<MusPlayer> player2Combo;
 
-		private final XWingMatch match;
+		private final MusMatch match;
 
-		public MatchPanel(XWingMatch match, int tableNumber) {
+		public MatchPanel(MusMatch match, int tableNumber) {
 
 			super(new FlowLayout(FlowLayout.CENTER));
 
@@ -389,9 +389,9 @@ public class XWingSwapPanel extends JPanel {
 
 		}
 
-		public XWingMatch getNewMatch() {
-			XWingPlayer p1 = (XWingPlayer) getPlayer1Combo().getSelectedItem();
-			XWingPlayer p2 = (XWingPlayer) getPlayer2Combo().getSelectedItem();
+		public MusMatch getNewMatch() {
+			MusPlayer p1 = (MusPlayer) getPlayer1Combo().getSelectedItem();
+			MusPlayer p2 = (MusPlayer) getPlayer2Combo().getSelectedItem();
 
 			if (p1 == blankPlayer) {
 				p1 = null;
@@ -410,7 +410,7 @@ public class XWingSwapPanel extends JPanel {
 				return null;
 			}
 
-			XWingMatch m = new XWingMatch(p1, p2);
+			MusMatch m = new MusMatch(p1, p2);
 
 			if (p2 == null) {
 				m.setBye(true);
@@ -419,10 +419,10 @@ public class XWingSwapPanel extends JPanel {
 			return m;
 		}
 
-		public JComboBox<XWingPlayer> getPlayer1Combo() {
+		public JComboBox<MusPlayer> getPlayer1Combo() {
 
 			if (player1Combo == null) {
-				player1Combo = new JComboBox<XWingPlayer>();
+				player1Combo = new JComboBox<MusPlayer>();
 				ComponentUtils.forceSize(player1Combo, 100, 25);
 				getPlayer1Combo().addItem(blankPlayer);
 				if (match.getPlayer1() != null) {
@@ -441,10 +441,10 @@ public class XWingSwapPanel extends JPanel {
 			return player1Combo;
 		}
 
-		public JComboBox<XWingPlayer> getPlayer2Combo() {
+		public JComboBox<MusPlayer> getPlayer2Combo() {
 
 			if (player2Combo == null) {
-				player2Combo = new JComboBox<XWingPlayer>();
+				player2Combo = new JComboBox<MusPlayer>();
 				ComponentUtils.forceSize(player2Combo, 100, 25);
 
 				getPlayer2Combo().addItem(blankPlayer);
@@ -464,16 +464,16 @@ public class XWingSwapPanel extends JPanel {
 			return player2Combo;
 		}
 
-		public void updateCombos(List<XWingPlayer> players) {
+		public void updateCombos(List<MusPlayer> players) {
 
-			XWingPlayer p1 = (XWingPlayer) getPlayer1Combo().getSelectedItem();
-			XWingPlayer p2 = (XWingPlayer) getPlayer2Combo().getSelectedItem();
+			MusPlayer p1 = (MusPlayer) getPlayer1Combo().getSelectedItem();
+			MusPlayer p2 = (MusPlayer) getPlayer2Combo().getSelectedItem();
 
 			getPlayer1Combo().removeAllItems();
 			getPlayer2Combo().removeAllItems();
 
-			List<XWingPlayer> list1 = new ArrayList<>();
-			List<XWingPlayer> list2 = new ArrayList<>();
+			List<MusPlayer> list1 = new ArrayList<>();
+			List<MusPlayer> list2 = new ArrayList<>();
 
 			if (p1 != blankPlayer) {
 				list1.add(p1);
@@ -483,7 +483,7 @@ public class XWingSwapPanel extends JPanel {
 				list2.add(p2);
 			}
 
-			for (XWingPlayer xp : players) {
+			for (MusPlayer xp : players) {
 				list1.add(xp);
 				list2.add(xp);
 			}
@@ -492,7 +492,7 @@ public class XWingSwapPanel extends JPanel {
 			Collections.sort(list2);
 
 			getPlayer1Combo().addItem(blankPlayer);
-			for (XWingPlayer xp : list1) {
+			for (MusPlayer xp : list1) {
 				getPlayer1Combo().addItem(xp);
 			}
 			if (p1 != blankPlayer) {
@@ -502,7 +502,7 @@ public class XWingSwapPanel extends JPanel {
 			}
 
 			getPlayer2Combo().addItem(blankPlayer);
-			for (XWingPlayer xp : list2) {
+			for (MusPlayer xp : list2) {
 				getPlayer2Combo().addItem(xp);
 			}
 			if (p2 != blankPlayer) {

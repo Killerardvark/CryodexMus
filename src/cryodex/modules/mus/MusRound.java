@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,46 +7,46 @@ import cryodex.xml.XMLObject;
 import cryodex.xml.XMLUtils;
 import cryodex.xml.XMLUtils.Element;
 
-public class XWingRound implements XMLObject {
-	private List<XWingMatch> matches;
-	private XWingRoundPanel panel;
+public class MusRound implements XMLObject {
+	private List<MusMatch> matches;
+	private MusRoundPanel panel;
 	private Boolean isSingleElimination = false;
 
-	public XWingRound(Element roundElement, XWingTournament t) {
+	public MusRound(Element roundElement, MusTournament t) {
 		this.isSingleElimination = roundElement
 				.getBooleanFromChild("ISSINGLEELIMINATION");
 
 		Element matchElement = roundElement.getChild("MATCHES");
 
 		if (matchElement != null) {
-			matches = new ArrayList<XWingMatch>();
+			matches = new ArrayList<MusMatch>();
 			for (Element e : matchElement.getChildren()) {
-				matches.add(new XWingMatch(e));
+				matches.add(new MusMatch(e));
 			}
 		}
 
-		this.panel = new XWingRoundPanel(t, matches);
+		this.panel = new MusRoundPanel(t, matches);
 	}
 
-	public XWingRound(List<XWingMatch> matches, XWingTournament t,
+	public MusRound(List<MusMatch> matches, MusTournament t,
 			Integer roundNumber) {
 		this.matches = matches;
-		this.panel = new XWingRoundPanel(t, matches);
+		this.panel = new MusRoundPanel(t, matches);
 	}
 
-	public List<XWingMatch> getMatches() {
+	public List<MusMatch> getMatches() {
 		return matches;
 	}
 
-	public void setMatches(List<XWingMatch> matches) {
+	public void setMatches(List<MusMatch> matches) {
 		this.matches = matches;
 	}
 
-	public XWingRoundPanel getPanel() {
+	public MusRoundPanel getPanel() {
 		return panel;
 	}
 
-	public void setPanel(XWingRoundPanel panel) {
+	public void setPanel(MusRoundPanel panel) {
 		this.panel = panel;
 	}
 
@@ -68,7 +68,7 @@ public class XWingRound implements XMLObject {
 	}
 
 	public boolean isComplete() {
-		for (XWingMatch m : getMatches()) {
+		for (MusMatch m : getMatches()) {
 			if (m.isMatchComplete() == false) {
 				return false;
 			}
@@ -78,7 +78,7 @@ public class XWingRound implements XMLObject {
 
 	public boolean isValid(boolean isSingleElimination) {
 		boolean result = true;
-		for (XWingMatch m : getMatches()) {
+		for (MusMatch m : getMatches()) {
 			if (m.isValidResult(isSingleElimination) == false) {
 				result = false;
 				break;

@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,7 +16,7 @@ import cryodex.xml.XMLObject;
 import cryodex.xml.XMLUtils;
 import cryodex.xml.XMLUtils.Element;
 
-public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
+public class MusPlayer implements Comparable<ModulePlayer>, XMLObject,
 		ModulePlayer {
 
 	public static enum Faction{
@@ -32,12 +32,12 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 	private Faction faction;
 	private HashMap<Faction, Integer> killMap;
 
-	public XWingPlayer(Player p) {
+	public MusPlayer(Player p) {
 		player = p;
 		seedValue = String.valueOf(Math.random());
 	}
 
-	public XWingPlayer(Player p, Element e) {
+	public MusPlayer(Player p, Element e) {
 		this.player = p;
 		this.seedValue = e.getStringFromChild("SEEDVALUE");
 		this.firstRoundBye = e.getBooleanFromChild("FIRSTROUNDBYE");
@@ -107,10 +107,10 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 			killMap.put(Faction.SCUM, 0);
 
 			for (Tournament t : CryodexController.getAllTournaments()) {
-			if(t instanceof XWingTournament){
-				XWingTournament tournament = (XWingTournament)t;
-				for (XWingRound r : tournament.getAllRounds()) {
-					for (XWingMatch m : r.getMatches()) {
+			if(t instanceof MusTournament){
+				MusTournament tournament = (MusTournament)t;
+				for (MusRound r : tournament.getAllRounds()) {
+					for (MusMatch m : r.getMatches()) {
 						if (m.getPlayer2() != null) {
 							if (m.getPlayer1() == this) {
 								Integer points = killMap.get(m.getPlayer2()
@@ -137,17 +137,17 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 	}
 
 
-	public List<XWingMatch> getMatches(XWingTournament t) {
+	public List<MusMatch> getMatches(MusTournament t) {
 
-		List<XWingMatch> matches = new ArrayList<XWingMatch>();
+		List<MusMatch> matches = new ArrayList<MusMatch>();
 
 		if (t != null) {
 
-			rounds: for (XWingRound r : t.getAllRounds()) {
-				if (r.isSingleElimination()) {
+			rounds: for (MusRound r : t.getAllRounds()) {
+				if (r.isSingleElimination() && t.isElimination() == false) {
 					continue;
 				}
-				for (XWingMatch m : r.getMatches()) {
+				for (MusMatch m : r.getMatches()) {
 					if (m.getPlayer1() == this
 							|| (m.getPlayer2() != null && m.getPlayer2() == this)) {
 						matches.add(m);
@@ -164,30 +164,30 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 		return getPlayer().getName();
 	}
 
-	public int getScore(XWingTournament t) {
+	public int getScore(MusTournament t) {
 		int score = 0;
-		for (XWingMatch match : getMatches(t)) {
+		for (MusMatch match : getMatches(t)) {
 			if (match.getWinner() == this) {
-				score += XWingMatch.WIN_POINTS;
+				score += MusMatch.WIN_POINTS;
 			} else if (match.isBye()) {
-				score += XWingMatch.BYE_POINTS;
+				score += MusMatch.BYE_POINTS;
 			} else {
-				score += XWingMatch.LOSS_POINTS;
+				score += MusMatch.LOSS_POINTS;
 			}
 		}
 
 		return score;
 	}
 
-	public double getAverageScore(XWingTournament t) {
+	public double getAverageScore(MusTournament t) {
 		return getScore(t) * 1.0 / getMatches(t).size();
 	}
 
-	public double getAverageSoS(XWingTournament t) {
+	public double getAverageSoS(MusTournament t) {
 		double sos = 0.0;
-		List<XWingMatch> matches = getMatches(t);
+		List<MusMatch> matches = getMatches(t);
 
-		for (XWingMatch m : matches) {
+		for (MusMatch m : matches) {
 			if (m.isBye() == false && m.getWinner() != null) {
 				if (m.getPlayer1() == this) {
 					sos += m.getPlayer2().getAverageScore(t);
@@ -210,9 +210,9 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 		return averageSos;
 	}
 
-	public int getWins(XWingTournament t) {
+	public int getWins(MusTournament t) {
 		int score = 0;
-		for (XWingMatch match : getMatches(t)) {
+		for (MusMatch match : getMatches(t)) {
 			if (match.getWinner() == this || match.isBye()) {
 				score++;
 			}
@@ -220,9 +220,9 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 		return score;
 	}
 
-	public int getLosses(XWingTournament t) {
+	public int getLosses(MusTournament t) {
 		int score = 0;
-		for (XWingMatch match : getMatches(t)) {
+		for (MusMatch match : getMatches(t)) {
 			if (match.getWinner() != null && match.getWinner() != this) {
 				score++;
 			}
@@ -230,9 +230,9 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 		return score;
 	}
 
-	public int getByes(XWingTournament t) {
+	public int getByes(MusTournament t) {
 		int byes = 0;
-		for (XWingMatch match : getMatches(t)) {
+		for (MusMatch match : getMatches(t)) {
 			if (match.isBye()) {
 				byes++;
 			}
@@ -261,11 +261,11 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 	// return sos;
 	// }
 
-	public int getRank(XWingTournament t) {
-		List<XWingPlayer> players = new ArrayList<XWingPlayer>();
+	public int getRank(MusTournament t) {
+		List<MusPlayer> players = new ArrayList<MusPlayer>();
 		players.addAll(t.getXWingPlayers());
-		Collections.sort(players, new XWingComparator(t,
-				XWingComparator.rankingCompare));
+		Collections.sort(players, new MusComparator(t,
+				MusComparator.rankingCompare));
 
 		for (int i = 0; i < players.size(); i++) {
 			if (players.get(i) == this) {
@@ -276,13 +276,13 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 		return 0;
 	}
 
-	public int getEliminationRank(XWingTournament t) {
+	public int getEliminationRank(MusTournament t) {
 
 		int rank = 0;
 
-		for (XWingRound r : t.getAllRounds()) {
+		for (MusRound r : t.getAllRounds()) {
 			if (r.isSingleElimination()) {
-				for (XWingMatch m : r.getMatches()) {
+				for (MusMatch m : r.getMatches()) {
 					if ((m.getPlayer1() == this || m.getPlayer2() == this)
 							&& (m.getWinner() != null && m.getWinner() != this)) {
 						return r.getMatches().size() * 2;
@@ -299,13 +299,13 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 		return rank;
 	}
 
-	public int getMarginOfVictory(XWingTournament t) {
+	public int getMarginOfVictory(MusTournament t) {
 
 		int roundNumber = 0;
 
 		Integer movPoints = 0;
 
-		for (XWingMatch match : getMatches(t)) {
+		for (MusMatch match : getMatches(t)) {
 
 			roundNumber++;
 
@@ -348,12 +348,12 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 	 * @param t
 	 * @return
 	 */
-	public boolean isHeadToHeadWinner(XWingTournament t) {
+	public boolean isHeadToHeadWinner(MusTournament t) {
 
 		if (t != null) {
 			int score = getScore(t);
-			List<XWingPlayer> players = new ArrayList<XWingPlayer>();
-			for (XWingPlayer p : t.getXWingPlayers()) {
+			List<MusPlayer> players = new ArrayList<MusPlayer>();
+			for (MusPlayer p : t.getXWingPlayers()) {
 				if (p != this && p.getScore(t) == score) {
 					players.add(p);
 				}
@@ -363,8 +363,8 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 				return false;
 			}
 
-			playerLoop: for (XWingPlayer p : players) {
-				for (XWingMatch m : p.getMatches(t)) {
+			playerLoop: for (MusPlayer p : players) {
+				for (MusMatch m : p.getMatches(t)) {
 					if (m.getWinner() != null && m.getWinner() == this) {
 						continue playerLoop;
 					}
@@ -376,12 +376,12 @@ public class XWingPlayer implements Comparable<ModulePlayer>, XMLObject,
 		return true;
 	}
 
-	public int getRoundDropped(XWingTournament t) {
+	public int getRoundDropped(MusTournament t) {
 		for (int i = t.getAllRounds().size(); i > 0; i--) {
 
 			boolean found = false;
-			XWingRound r = t.getAllRounds().get(i - 1);
-			for (XWingMatch m : r.getMatches()) {
+			MusRound r = t.getAllRounds().get(i - 1);
+			for (MusMatch m : r.getMatches()) {
 				if (m.getPlayer1() == this) {
 					found = true;
 					break;

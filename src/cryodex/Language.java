@@ -21,7 +21,9 @@ public class Language {
 	public static final String random = "Aleatorio";
 	public static final String seperate_by_group_name = "Separar por Nombre de Grupo";
 	public static final String by_ranking = "Por Ranking";
-	public static final String start_as_single_elimination = "Empezar Torneo como Eliminatoria Simple<br>(solo para 2/4/8/16/32 parejas)";
+	public static final String start_as_single_elimination = "Empezar Torneo como Eliminatoria Simple";
+	public static final String start_as_double_elimination = "Empezar Torneo como Eliminatoria Doble";
+	public static final String start_as_triple_elimination = "Empezar Torneo como Eliminatoria Triple";
 	public static final String standard_points = "Standard - 100 Puntos Partida";
 	public static final String escalation_points = "Escala - 60,90,120,150 Puntos";
 	public static final String epic_points = "Epico - 300 Puntos Partida";

@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,21 +33,21 @@ import cryodex.Player;
 import cryodex.widget.ComponentUtils;
 import cryodex.widget.ConfirmationTextField;
 
-public class XWingRoundPanel extends JPanel {
+public class MusRoundPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private final List<XWingMatch> matches;
+	private final List<MusMatch> matches;
 	private final List<GamePanel> gamePanels = new ArrayList<GamePanel>();
 	private JPanel quickEntryPanel;
 	private JPanel quickEntrySubPanel;
 	private JTextField roundNumber;
-	private JComboBox<XWingPlayer> playerCombo;
+	private JComboBox<MusPlayer> playerCombo;
 	private final JScrollPane scroll;
 
-	private final XWingTournament tournament;
+	private final MusTournament tournament;
 
-	public XWingRoundPanel(XWingTournament t, List<XWingMatch> matches) {
+	public MusRoundPanel(MusTournament t, List<MusMatch> matches) {
 
 		super(new BorderLayout());
 
@@ -56,7 +56,7 @@ public class XWingRoundPanel extends JPanel {
 		this.setBorder(BorderFactory.createLineBorder(Color.black));
 
 		int counter = 1;
-		for (XWingMatch match : matches) {
+		for (MusMatch match : matches) {
 			GamePanel gpanel = new GamePanel(counter, match);
 			gamePanels.add(gpanel);
 			counter++;
@@ -105,14 +105,14 @@ public class XWingRoundPanel extends JPanel {
 				}
 			});
 
-			List<XWingPlayer> playerList = new ArrayList<XWingPlayer>();
+			List<MusPlayer> playerList = new ArrayList<MusPlayer>();
 
-			playerList.add(new XWingPlayer(new Player()));
+			playerList.add(new MusPlayer(new Player()));
 			playerList.addAll(tournament.getXWingPlayers());
 
 			Collections.sort(playerList);
 
-			playerCombo = new JComboBox<XWingPlayer>(playerList.toArray(new XWingPlayer[playerList.size()]));
+			playerCombo = new JComboBox<MusPlayer>(playerList.toArray(new MusPlayer[playerList.size()]));
 
 			playerCombo.addActionListener(new ActionListener() {
 
@@ -139,7 +139,7 @@ public class XWingRoundPanel extends JPanel {
 
 		scroll.getViewport().removeAll();
 		scroll.getViewport().add(ComponentUtils.addToFlowLayout(buildPanel(), FlowLayout.CENTER));
-		ComponentUtils.repaint(XWingRoundPanel.this);
+		ComponentUtils.repaint(MusRoundPanel.this);
 
 		Integer i = null;
 		try {
@@ -148,7 +148,7 @@ public class XWingRoundPanel extends JPanel {
 
 		}
 
-		XWingPlayer player = playerCombo.getSelectedIndex() == 0 ? null : (XWingPlayer) playerCombo.getSelectedItem();
+		MusPlayer player = playerCombo.getSelectedIndex() == 0 ? null : (MusPlayer) playerCombo.getSelectedItem();
 
 		if (player != null) {
 			roundNumber.setEnabled(false);
@@ -281,7 +281,7 @@ public class XWingRoundPanel extends JPanel {
 		return panel;
 	}
 
-	public List<XWingMatch> getMatches() {
+	public List<MusMatch> getMatches() {
 		return matches;
 	}
 
@@ -294,7 +294,7 @@ public class XWingRoundPanel extends JPanel {
 	}
 
 	private class GamePanel {
-		private final XWingMatch match;
+		private final MusMatch match;
 		private JLabel playersTitle;
 		private JComboBox<String> resultsCombo;
 		private ConfirmationTextField player1KillPoints;
@@ -304,7 +304,7 @@ public class XWingRoundPanel extends JPanel {
 		private boolean isLoading = false;
 		private int tableNumber = -1;
 
-		public GamePanel(int tableNumber, XWingMatch match) {
+		public GamePanel(int tableNumber, MusMatch match) {
 
 			this.tableNumber = tableNumber;
 
@@ -340,7 +340,7 @@ public class XWingRoundPanel extends JPanel {
 			isLoading = false;
 		}
 
-		private XWingMatch getMatch() {
+		private MusMatch getMatch() {
 			return match;
 		}
 
@@ -374,7 +374,7 @@ public class XWingRoundPanel extends JPanel {
 				String[] values = { Language.select_a_result, Language.bye };
 				return values;
 			} else {
-				String generic = XWingModule.getInstance().getOptions().isEnterOnlyPoints() ? Language.enter_results
+				String generic = MusModule.getInstance().getOptions().isEnterOnlyPoints() ? Language.enter_results
 						: Language.select_a_result;
 				String[] values = { generic, Language.win + " - " + match.getPlayer1().getName(),
 						Language.win + " - " + match.getPlayer2().getName() };
@@ -453,7 +453,7 @@ public class XWingRoundPanel extends JPanel {
 						match.setPlayer1PointsDestroyed(points);
 						tournament.getTournamentGUI().getRankingTable().resetPlayers();
 
-						if (XWingModule.getInstance().getOptions().isEnterOnlyPoints()) {
+						if (MusModule.getInstance().getOptions().isEnterOnlyPoints()) {
 							setResultsCombo();
 						}
 					}
@@ -485,7 +485,7 @@ public class XWingRoundPanel extends JPanel {
 						match.setPlayer2PointsDestroyed(points);
 						tournament.getTournamentGUI().getRankingTable().resetPlayers();
 
-						if (XWingModule.getInstance().getOptions().isEnterOnlyPoints()) {
+						if (MusModule.getInstance().getOptions().isEnterOnlyPoints()) {
 							setResultsCombo();
 						}
 					}
@@ -504,8 +504,8 @@ public class XWingRoundPanel extends JPanel {
 
 			String titleText = null;
 
-			boolean showKillPoints = XWingModule.getInstance().getOptions().isShowKillPoints();
-			boolean enterOnlyPoints = XWingModule.getInstance().getOptions().isEnterOnlyPoints();
+			boolean showKillPoints = MusModule.getInstance().getOptions().isShowKillPoints();
+			boolean enterOnlyPoints = MusModule.getInstance().getOptions().isEnterOnlyPoints();
 
 			getPlayer1KillLabel().setVisible(showKillPoints);
 			getPlayer1KillPointsField().setVisible(showKillPoints);
@@ -555,7 +555,7 @@ public class XWingRoundPanel extends JPanel {
 		 */
 		public void setResultsCombo() {
 
-			boolean enterOnlyPoints = XWingModule.getInstance().getOptions().isEnterOnlyPoints();
+			boolean enterOnlyPoints = MusModule.getInstance().getOptions().isEnterOnlyPoints();
 
 			if (match.getPlayer1PointsDestroyed() != null || match.getPlayer2PointsDestroyed() != null) {
 

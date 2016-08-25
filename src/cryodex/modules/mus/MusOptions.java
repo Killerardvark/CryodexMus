@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import cryodex.CryodexController;
 import cryodex.modules.Tournament;
@@ -6,15 +6,15 @@ import cryodex.xml.XMLObject;
 import cryodex.xml.XMLUtils;
 import cryodex.xml.XMLUtils.Element;
 
-public class XWingOptions implements XMLObject {
+public class MusOptions implements XMLObject {
 	boolean showKillPoints = true;
 	boolean enterOnlyPoints = true;
 
-	public XWingOptions() {
+	public MusOptions() {
 
 	}
 
-	public XWingOptions(Element e) {
+	public MusOptions(Element e) {
 
 		if (e != null) {
 			showKillPoints = e.getBooleanFromChild("SHOWKILLPOINTS", true);
@@ -44,7 +44,7 @@ public class XWingOptions implements XMLObject {
 		if (CryodexController.isLoading == false
 				&& CryodexController.getAllTournaments() != null) {
 			for (Tournament t : CryodexController.getAllTournaments()) {
-				if (t instanceof XWingTournament) {
+				if (t instanceof MusTournament) {
 					t.updateVisualOptions();
 				}
 			}

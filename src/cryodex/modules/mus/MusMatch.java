@@ -1,4 +1,4 @@
-package cryodex.modules.xwing;
+package cryodex.modules.mus;
 
 import java.util.List;
 
@@ -10,49 +10,49 @@ import cryodex.xml.XMLObject;
 import cryodex.xml.XMLUtils;
 import cryodex.xml.XMLUtils.Element;
 
-public class XWingMatch implements XMLObject {
+public class MusMatch implements XMLObject {
 
 	public static final int WIN_POINTS = 1;
 	public static final int BYE_POINTS = 1;
 	public static final int LOSS_POINTS = 0;
 
-	private XWingPlayer player1;
-	private XWingPlayer player2;
-	private XWingPlayer winner;
+	private MusPlayer player1;
+	private MusPlayer player2;
+	private MusPlayer winner;
 	private boolean isBye = false;
 	private Integer player1PointsDestroyed;
 	private Integer player2PointsDestroyed;
 	private boolean isDuplicate;
 
-	public XWingMatch() {
+	public MusMatch() {
 
 	}
 
-	public XWingMatch(XWingPlayer player1, XWingPlayer player2) {
+	public MusMatch(MusPlayer player1, MusPlayer player2) {
 		this.player1 = player1;
 		this.player2 = player2;
 	}
 
-	public XWingMatch(Element matchElement) {
+	public MusMatch(Element matchElement) {
 
 		Module m = Modules.getModuleByName(getModuleName());
 
 		String player1String = matchElement.getStringFromChild("PLAYER1");
 		Player p = CryodexController.getPlayerByID(player1String);
 		if (p != null) {
-			player1 = (XWingPlayer) p.getModuleInfoByModule(m);
+			player1 = (MusPlayer) p.getModuleInfoByModule(m);
 		}
 
 		String player2String = matchElement.getStringFromChild("PLAYER2");
 		p = CryodexController.getPlayerByID(player2String);
 		if (p != null) {
-			player2 = (XWingPlayer) p.getModuleInfoByModule(m);
+			player2 = (MusPlayer) p.getModuleInfoByModule(m);
 		}
 
 		String winnerString = matchElement.getStringFromChild("WINNER");
 		p = CryodexController.getPlayerByID(winnerString);
 		if (p != null) {
-			winner = (XWingPlayer) p.getModuleInfoByModule(m);
+			winner = (MusPlayer) p.getModuleInfoByModule(m);
 		}
 
 		isBye = matchElement.getBooleanFromChild("ISBYE");
@@ -63,27 +63,27 @@ public class XWingMatch implements XMLObject {
 
 	}
 
-	public XWingPlayer getPlayer1() {
+	public MusPlayer getPlayer1() {
 		return player1;
 	}
 
-	public void setPlayer1(XWingPlayer player1) {
+	public void setPlayer1(MusPlayer player1) {
 		this.player1 = player1;
 	}
 
-	public XWingPlayer getPlayer2() {
+	public MusPlayer getPlayer2() {
 		return player2;
 	}
 
-	public void setPlayer2(XWingPlayer player2) {
+	public void setPlayer2(MusPlayer player2) {
 		this.player2 = player2;
 	}
 
-	public XWingPlayer getWinner() {
+	public MusPlayer getWinner() {
 		return winner;
 	}
 
-	public void setWinner(XWingPlayer winner) {
+	public void setWinner(MusPlayer winner) {
 		this.winner = winner;
 	}
 
@@ -143,19 +143,19 @@ public class XWingMatch implements XMLObject {
 		return false;
 	}
 
-	public void checkDuplicate(List<XWingRound> rounds) {
+	public void checkDuplicate(List<MusRound> rounds) {
 
 		if (this.getPlayer2() == null) {
 			this.setDuplicate(false);
 			return;
 		}
 
-		for (XWingRound r : rounds) {
+		for (MusRound r : rounds) {
 			if (r.isSingleElimination()) {
 				continue;
 			}
 
-			for (XWingMatch match : r.getMatches()) {
+			for (MusMatch match : r.getMatches()) {
 				if (match.getPlayer2() == null || match == this) {
 					continue;
 				}
@@ -190,9 +190,9 @@ public class XWingMatch implements XMLObject {
 		return sb;
 	}
 
-	public static boolean hasDuplicate(List<XWingMatch> matches) {
+	public static boolean hasDuplicate(List<MusMatch> matches) {
 		boolean duplicateFound = false;
-		for (XWingMatch dc : matches) {
+		for (MusMatch dc : matches) {
 			if (dc.isDuplicate()) {
 				duplicateFound = true;
 				break;

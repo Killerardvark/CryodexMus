@@ -1,4 +1,4 @@
-package cryodex.modules.xwing.export;
+package cryodex.modules.mus.export;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -14,24 +14,24 @@ import cryodex.CryodexController;
 import cryodex.Language;
 import cryodex.Player;
 import cryodex.modules.Tournament;
-import cryodex.modules.xwing.XWingComparator;
-import cryodex.modules.xwing.XWingMatch;
-import cryodex.modules.xwing.XWingPlayer;
-import cryodex.modules.xwing.XWingRound;
-import cryodex.modules.xwing.XWingTournament;
+import cryodex.modules.mus.MusComparator;
+import cryodex.modules.mus.MusMatch;
+import cryodex.modules.mus.MusPlayer;
+import cryodex.modules.mus.MusRound;
+import cryodex.modules.mus.MusTournament;
 
 public class XWingExportController {
 
-	public static String appendRankings(XWingTournament tournament) {
-		List<XWingPlayer> playerList = new ArrayList<XWingPlayer>();
-		List<XWingPlayer> activePlayers = tournament.getXWingPlayers();
+	public static String appendRankings(MusTournament tournament) {
+		List<MusPlayer> playerList = new ArrayList<MusPlayer>();
+		List<MusPlayer> activePlayers = tournament.getXWingPlayers();
 
 		playerList.addAll(tournament.getAllXWingPlayers());
-		Collections.sort(playerList, new XWingComparator(tournament, XWingComparator.rankingCompare));
+		Collections.sort(playerList, new MusComparator(tournament, MusComparator.rankingCompare));
 
 		String content = "<table border=\"1\"><tr><th>"+Language.rank+"</th><th>"+Language.name+"</th><th>"+Language.score+"</th><th>"+Language.mov+"</th><th>"+Language.sos+"</th></tr>";
 
-		for (XWingPlayer p : playerList) {
+		for (MusPlayer p : playerList) {
 
 			String name = p.getName();
 
@@ -49,18 +49,18 @@ public class XWingExportController {
 		return content;
 	}
 
-	public static void exportRankings(XWingTournament tournament) {
+	public static void exportRankings(MusTournament tournament) {
 
 		String content = appendRankings(tournament);
 
 		displayHTML(content, Language.export_rankings);
 	}
 
-	public static String appendMatches(XWingTournament tournament, List<XWingMatch> matches) {
+	public static String appendMatches(MusTournament tournament, List<MusMatch> matches) {
 		String content = "";
 
 		int counter = 1;
-		for (XWingMatch m : matches) {
+		for (MusMatch m : matches) {
 			String matchString = "";
 			if (m.getPlayer2() == null) {
 				matchString += m.getPlayer1().getName() + Language.has_a_bye_fragment;
@@ -90,9 +90,9 @@ public class XWingExportController {
 
 	public static void exportMatches() {
 
-		XWingTournament tournament = (XWingTournament) CryodexController.getActiveTournament();
+		MusTournament tournament = (MusTournament) CryodexController.getActiveTournament();
 
-		List<XWingTournament> xwingTournaments = new ArrayList<XWingTournament>();
+		List<MusTournament> xwingTournaments = new ArrayList<MusTournament>();
 		if (tournament.getName().endsWith(" 1")) {
 
 			String name = tournament.getName().substring(0, tournament.getName().lastIndexOf(" "));
@@ -100,8 +100,8 @@ public class XWingExportController {
 			List<Tournament> tournaments = CryodexController.getAllTournaments();
 
 			for (Tournament t : tournaments) {
-				if (t instanceof XWingTournament && t.getName().contains(name)) {
-					xwingTournaments.add((XWingTournament) t);
+				if (t instanceof MusTournament && t.getName().contains(name)) {
+					xwingTournaments.add((MusTournament) t);
 				}
 			}
 		} else {
@@ -110,13 +110,13 @@ public class XWingExportController {
 
 		String content = "";
 
-		for (XWingTournament xt : xwingTournaments) {
+		for (MusTournament xt : xwingTournaments) {
 
-			XWingRound round = xt.getLatestRound();
+			MusRound round = xt.getLatestRound();
 
 			int roundNumber = round.isSingleElimination() ? 0 : xt.getRoundNumber(round);
 
-			List<XWingMatch> matches = round.getMatches();
+			List<MusMatch> matches = round.getMatches();
 
 			content += "<h3>"+Language.event+": " + xt.getName() + "</h3>";
 
@@ -131,10 +131,10 @@ public class XWingExportController {
 		displayHTML(content, Language.export_matches);
 	}
 
-	public static void exportTournamentReport(XWingTournament tournament) {
+	public static void exportTournamentReport(MusTournament tournament) {
 		String content = "";
 		int roundNumber = 1;
-		for (XWingRound r : tournament.getAllRounds()) {
+		for (MusRound r : tournament.getAllRounds()) {
 			if (r.isSingleElimination()) {
 				content += "<h3>"+Language.top+" " + (r.getMatches().size() * 2) + "</h3>";
 			} else {
@@ -151,13 +151,13 @@ public class XWingExportController {
 		displayHTML(content, Language.tournament_report);
 	}
 
-	public static void exportTournamentSlipsWithStats(XWingTournament tournament, List<XWingMatch> matches,
+	public static void exportTournamentSlipsWithStats(MusTournament tournament, List<MusMatch> matches,
 			int roundNumber) {
 
 		String content = "";
 
 		int counter = 1;
-		for (XWingMatch m : matches) {
+		for (MusMatch m : matches) {
 			String matchString = "";
 			if (m.getPlayer2() != null) {
 				matchString += "<table width=100%><tr><th><h4>" +Language.round+" " + roundNumber + " - "+Language.table+" " + counter
@@ -198,12 +198,12 @@ public class XWingExportController {
 		displayHTML(content, Language.export_match_slips);
 	}
 
-	public static void exportTournamentSlips(XWingTournament tournament, List<XWingMatch> matches, int roundNumber) {
+	public static void exportTournamentSlips(MusTournament tournament, List<MusMatch> matches, int roundNumber) {
 
 		String content = "";
 
 		int counter = 1;
-		for (XWingMatch m : matches) {
+		for (MusMatch m : matches) {
 			String matchString = "";
 			if (m.getPlayer2() != null) {
 				matchString += "<table width=100%><tr><td><h4>" +Language.round+" " + roundNumber + " - "+Language.table+" " + counter
