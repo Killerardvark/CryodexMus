@@ -58,7 +58,7 @@ public class Main extends JFrame {
 
 	private Main() {
 
-		super("Cryodex - Mus - 1.1");
+		super("Cryodex - Mus - 1.2");
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {

@@ -227,7 +227,7 @@ public class MusMenu implements Menu {
 							int playerCount = r.getMatches().size() * 2;
 							tournament.cancelRound(tournament.getRoundNumber(r));
 							tournament
-									.generateSingleEliminationMatches(playerCount);
+									.generateSingleEliminationMatches(playerCount, false);
 						} else {
 							tournament.generateRound(index + 1);
 						}
@@ -505,7 +505,7 @@ public class MusMenu implements Menu {
 
 		private static final long serialVersionUID = 1945413167979638452L;
 
-		private final JComboBox<Integer> cutCombo;
+		private final JComboBox<String> cutCombo;
 
 		public CutPlayersDialog() {
 			super(Main.getInstance(), Language.cut_players, true);
@@ -515,17 +515,17 @@ public class MusMenu implements Menu {
 			int currentPlayers = CryodexController.getActiveTournament()
 					.getPlayers().size();
 
-			Integer[] options = { 2, 4, 8, 16, 32, 64 };
+			String[] options = { "2 ", "4 (1v4,2v3)", "4 (1v2,3v4)", "8 ", "16", "32", "64" };
 
-			while (options[options.length - 1] > currentPlayers) {
-				Integer[] tempOptions = new Integer[options.length - 1];
+			while (Integer.valueOf(options[options.length - 1].substring(0, 1).trim()) > currentPlayers) {
+				String[] tempOptions = new String[options.length - 1];
 				for (int i = 0; i < tempOptions.length; i++) {
 					tempOptions[i] = options[i];
 				}
 				options = tempOptions;
 			}
 
-			cutCombo = new JComboBox<Integer>(options);
+			cutCombo = new JComboBox<String>(options);
 			ComponentUtils.forceSize(cutCombo, 10, 25);
 
 			JButton add = new JButton(Language.make_cut);
@@ -534,10 +534,14 @@ public class MusMenu implements Menu {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 
-					Integer p = (Integer) cutCombo.getSelectedItem();
+					String selectedValue = (String) cutCombo.getSelectedItem();
 
+					Integer p = Integer.valueOf(selectedValue.substring(0, 1).trim());
+					
+					boolean special = "4 (1v2,3v4)".equals(selectedValue);
+					
 					CryodexController.getActiveTournament()
-							.generateSingleEliminationMatches(p);
+							.generateSingleEliminationMatches(p, special);
 
 					CutPlayersDialog.this.setVisible(false);
 

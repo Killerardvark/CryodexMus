@@ -29,7 +29,7 @@ public class MusTournament implements XMLObject, Tournament {
 	public enum InitialSeedingEnum {
 		RANDOM, BY_GROUP, IN_ORDER;
 	}
-	
+
 	public enum TournamentTypeEnum {
 		SWISS, SINGLE, DOUBLE, TRIPLE;
 	}
@@ -74,18 +74,16 @@ public class MusTournament implements XMLObject, Tournament {
 
 		name = tournamentElement.getStringFromChild("NAME");
 		points = tournamentElement.getIntegerFromChild("POINTS");
-		
+
 		String tournamentTypeString = tournamentElement.getStringFromChild("TOURNAMENTTYPE");
-		
-		if(tournamentTypeString != null && tournamentTypeString.isEmpty() == false){
+
+		if (tournamentTypeString != null && tournamentTypeString.isEmpty() == false) {
 			tournamentType = TournamentTypeEnum.valueOf(tournamentTypeString);
 		}
 
-		String escalationPointsString = tournamentElement
-				.getStringFromChild("ESCALATIONPOINTS");
+		String escalationPointsString = tournamentElement.getStringFromChild("ESCALATIONPOINTS");
 
-		if (escalationPointsString != null
-				&& escalationPointsString.isEmpty() == false) {
+		if (escalationPointsString != null && escalationPointsString.isEmpty() == false) {
 			escalationPoints = new ArrayList<Integer>();
 			for (String s : escalationPointsString.split(",")) {
 				escalationPoints.add(new Integer(s));
@@ -95,12 +93,10 @@ public class MusTournament implements XMLObject, Tournament {
 		int counter = 1;
 		for (MusRound r : rounds) {
 			if (r.isSingleElimination() && isElimination() == false) {
-				getTournamentGUI().getRoundTabbedPane()
-						.addSingleEliminationTab(r.getMatches().size() * 2,
-								r.getPanel());
-			} else {
-				getTournamentGUI().getRoundTabbedPane().addSwissTab(counter,
+				getTournamentGUI().getRoundTabbedPane().addSingleEliminationTab(r.getMatches().size() * 2,
 						r.getPanel());
+			} else {
+				getTournamentGUI().getRoundTabbedPane().addSwissTab(counter, r.getPanel());
 				counter++;
 			}
 
@@ -109,8 +105,7 @@ public class MusTournament implements XMLObject, Tournament {
 		getTournamentGUI().getRankingTable().setPlayers(getAllXWingPlayers());
 	}
 
-	public MusTournament(String name, List<MusPlayer> players,
-			InitialSeedingEnum seedingEnum, Integer points,
+	public MusTournament(String name, List<MusPlayer> players, InitialSeedingEnum seedingEnum, Integer points,
 			List<Integer> escalationPoints, TournamentTypeEnum tournamentType) {
 		this.name = name;
 		this.players = new ArrayList<>(players);
@@ -155,8 +150,7 @@ public class MusTournament implements XMLObject, Tournament {
 		if (rounds == null) {
 			return null;
 		} else {
-			return getAllRounds().get(
-					getTournamentGUI().getRoundTabbedPane().getSelectedIndex());
+			return getAllRounds().get(getTournamentGUI().getRoundTabbedPane().getSelectedIndex());
 		}
 	}
 
@@ -214,8 +208,7 @@ public class MusTournament implements XMLObject, Tournament {
 		// TreeSets and Head To Head comparisons can have problems.
 		// Do not use them together.
 		Set<MusPlayer> allPlayers = new TreeSet<MusPlayer>(
-				new MusComparator(this,
-						MusComparator.rankingCompareNoHeadToHead));
+				new MusComparator(this, MusComparator.rankingCompareNoHeadToHead));
 
 		for (MusRound r : getAllRounds()) {
 			for (MusMatch m : r.getMatches()) {
@@ -283,43 +276,38 @@ public class MusTournament implements XMLObject, Tournament {
 
 		// All matches must have a result filled in
 		if (getLatestRound().isComplete() == false) {
-			JOptionPane
-					.showMessageDialog(Main.getInstance(),
-							Language.round_incomplete);
+			JOptionPane.showMessageDialog(Main.getInstance(), Language.round_incomplete);
 			return false;
 		}
 
 		// Single elimination checks
 		if (getLatestRound().isSingleElimination()) {
-			
+
 			generateEliminationRound(getAllRounds().size() + 1);
-			
+
 			// If there was only one match then there is no reason to create a
 			// new round.
-//			if (getLatestRound().getMatches().size() == 1) {
-//				JOptionPane
-//						.showMessageDialog(Main.getInstance(),
-//								Language.final_round);
-//				return false;
-//			}
-//
-//			if (getLatestRound().isValid(true) == false) {
-//				JOptionPane
-//						.showMessageDialog(
-//								Main.getInstance(),
-//								Language.round_invalid);
-//				return false;
-//			}
-//
-//			generateSingleEliminationMatches(getLatestRound().getMatches()
-//					.size());
+			// if (getLatestRound().getMatches().size() == 1) {
+			// JOptionPane
+			// .showMessageDialog(Main.getInstance(),
+			// Language.final_round);
+			// return false;
+			// }
+			//
+			// if (getLatestRound().isValid(true) == false) {
+			// JOptionPane
+			// .showMessageDialog(
+			// Main.getInstance(),
+			// Language.round_invalid);
+			// return false;
+			// }
+			//
+			// generateSingleEliminationMatches(getLatestRound().getMatches()
+			// .size());
 		} else {
 			// Regular swiss round checks
 			if (getLatestRound().isValid(false) == false) {
-				JOptionPane
-						.showMessageDialog(
-								Main.getInstance(),
-								Language.round_invalid);
+				JOptionPane.showMessageDialog(Main.getInstance(), Language.round_invalid);
 				return false;
 			}
 
@@ -360,80 +348,99 @@ public class MusTournament implements XMLObject, Tournament {
 		}
 
 		cancelRound(roundNumber);
-		
-		if(tournamentType == TournamentTypeEnum.SINGLE || tournamentType == TournamentTypeEnum.DOUBLE || tournamentType == TournamentTypeEnum.TRIPLE){
+
+		if (tournamentType == TournamentTypeEnum.DOUBLE || tournamentType == TournamentTypeEnum.TRIPLE) {
+			for (MusPlayer p : new ArrayList<MusPlayer>(getXWingPlayers())) {
+				if (tournamentType == TournamentTypeEnum.DOUBLE && p.getLosses(this) >= 2) {
+					dropPlayer(p.getPlayer());
+				}
+				if (tournamentType == TournamentTypeEnum.TRIPLE && p.getLosses(this) >= 3) {
+					dropPlayer(p.getPlayer());
+				}
+			}
+		}
+
+		if (tournamentType == TournamentTypeEnum.SINGLE) {
 			generateEliminationRound(roundNumber);
 		} else {
 			generateSwissRound(roundNumber);
 		}
-		
+
 		getTournamentGUI().getRankingTable().setPlayers(getAllXWingPlayers());
 	}
-	
-	private void generateEliminationRound(int roundNumber){
-		
+
+	private void generateEliminationRound(int roundNumber) {
+
 		List<MusMatch> matches = new ArrayList<MusMatch>();
-		
-		if(tournamentType == TournamentTypeEnum.SINGLE){
+
+		if (tournamentType == TournamentTypeEnum.SINGLE) {
 			matches = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 0);
-		} else if(tournamentType == TournamentTypeEnum.DOUBLE){
-			matches = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 0);
-
-			List<MusMatch> matches2 = new ArrayList<MusMatch>();			
-			matches2 = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 1);
-			
-			if(matches2.size() == 1 && matches.size() == 1){
-				if(matches2.get(0).isBye() && matches.get(0).isBye()){
-					matches.get(0).setPlayer2(matches2.get(0).getPlayer1());
-					matches.get(0).setBye(false);
-					matches2.clear();
-				}
-			}
-
-			matches.addAll(matches2);
-			
-		} else if(tournamentType == TournamentTypeEnum.TRIPLE){
-			matches = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 0);
-
-			List<MusMatch> matches2 = new ArrayList<MusMatch>();
-			matches2 = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 1);
-
-			List<MusMatch> matches3 = new ArrayList<MusMatch>();
-			matches3 = MusEliminationMatchBuilder.getBracketMatches(this, getXWingPlayers(), 2);
-			
-			if(matches3.size() == 1 && matches2.size() == 1){
-				if(matches3.get(0).isBye() && matches2.get(0).isBye()){
-					matches2.get(0).setPlayer2(matches3.get(0).getPlayer1());
-					matches2.get(0).setBye(false);
-					matches3.clear();
-				}
-			}
-			if(matches2.size() == 1 && matches.size() == 1 && matches3.size() == 0){
-				if(matches2.get(0).isBye() && matches.get(0).isBye()){
-					matches.get(0).setPlayer2(matches2.get(0).getPlayer1());
-					matches.get(0).setBye(false);
-					matches2.clear();
-				}
-			}
-			if(matches3.size() == 1 && matches.size() == 1 && matches2.size() == 0){
-				if(matches3.get(0).isBye() && matches.get(0).isBye()){
-					matches.get(0).setPlayer2(matches3.get(0).getPlayer1());
-					matches.get(0).setBye(false);
-					matches3.clear();
-				}
-			}
-			
-			matches.addAll(matches2);
-			matches.addAll(matches3);
 		}
-		
+		// } else if (tournamentType == TournamentTypeEnum.DOUBLE) {
+		// matches = MusEliminationMatchBuilder.getBracketMatches(this,
+		// getXWingPlayers(), 0);
+		//
+		// List<MusMatch> matches2 = new ArrayList<MusMatch>();
+		// matches2 = MusEliminationMatchBuilder.getBracketMatches(this,
+		// getXWingPlayers(), 1);
+		//
+		// if (matches2.size() == 1 && matches.size() == 1) {
+		// if (matches2.get(0).isBye() && matches.get(0).isBye()) {
+		// matches.get(0).setPlayer2(matches2.get(0).getPlayer1());
+		// matches.get(0).setBye(false);
+		// matches2.clear();
+		// }
+		// }
+		//
+		// matches.addAll(matches2);
+		//
+		// } else if (tournamentType == TournamentTypeEnum.TRIPLE) {
+		// matches = MusEliminationMatchBuilder.getBracketMatches(this,
+		// getXWingPlayers(), 0);
+		//
+		// List<MusMatch> matches2 = new ArrayList<MusMatch>();
+		// matches2 = MusEliminationMatchBuilder.getBracketMatches(this,
+		// getXWingPlayers(), 1);
+		//
+		// List<MusMatch> matches3 = new ArrayList<MusMatch>();
+		// matches3 = MusEliminationMatchBuilder.getBracketMatches(this,
+		// getXWingPlayers(), 2);
+		//
+		// if (matches3.size() == 1 && matches2.size() == 1) {
+		// if (matches3.get(0).isBye() && matches2.get(0).isBye()) {
+		// matches2.get(0).setPlayer2(matches3.get(0).getPlayer1());
+		// matches2.get(0).setBye(false);
+		// matches3.clear();
+		// }
+		// }
+		// if (matches2.size() == 1 && matches.size() == 1 && matches3.size() ==
+		// 0) {
+		// if (matches2.get(0).isBye() && matches.get(0).isBye()) {
+		// matches.get(0).setPlayer2(matches2.get(0).getPlayer1());
+		// matches.get(0).setBye(false);
+		// matches2.clear();
+		// }
+		// }
+		// if (matches3.size() == 1 && matches.size() == 1 && matches2.size() ==
+		// 0) {
+		// if (matches3.get(0).isBye() && matches.get(0).isBye()) {
+		// matches.get(0).setPlayer2(matches3.get(0).getPlayer1());
+		// matches.get(0).setBye(false);
+		// matches3.clear();
+		// }
+		// }
+		//
+		// matches.addAll(matches2);
+		// matches.addAll(matches3);
+		// }
+
 		MusRound r = new MusRound(matches, this, roundNumber);
 		r.setSingleElimination(true);
 		rounds.add(r);
-		getTournamentGUI().getRoundTabbedPane().addSwissTab(roundNumber, r.getPanel());;
+		getTournamentGUI().getRoundTabbedPane().addSwissTab(roundNumber, r.getPanel());
 	}
-	
-	private void generateSwissRound(int roundNumber){
+
+	private void generateSwissRound(int roundNumber) {
 		List<MusMatch> matches;
 		if (roundNumber == 1) {
 
@@ -485,13 +492,11 @@ public class MusTournament implements XMLObject, Tournament {
 
 				// Add players to map
 				for (MusPlayer p : tempList) {
-					List<MusPlayer> playerList = playerMap.get(p.getPlayer()
-							.getGroupName());
+					List<MusPlayer> playerList = playerMap.get(p.getPlayer().getGroupName());
 
 					if (playerList == null) {
 						playerList = new ArrayList<>();
-						String groupName = p.getPlayer().getGroupName() == null ? ""
-								: p.getPlayer().getGroupName();
+						String groupName = p.getPlayer().getGroupName() == null ? "" : p.getPlayer().getGroupName();
 						playerMap.put(groupName, playerList);
 					}
 
@@ -547,17 +552,13 @@ public class MusTournament implements XMLObject, Tournament {
 		}
 		MusRound r = new MusRound(matches, this, roundNumber);
 		rounds.add(r);
-		if (roundNumber == 1
-				&& tournamentType == TournamentTypeEnum.SINGLE
-				&& (matches.size() == 1 || matches.size() == 2
-						|| matches.size() == 4 || matches.size() == 8
+		if (roundNumber == 1 && tournamentType == TournamentTypeEnum.SINGLE
+				&& (matches.size() == 1 || matches.size() == 2 || matches.size() == 4 || matches.size() == 8
 						|| matches.size() == 16 || matches.size() == 32)) {
 			r.setSingleElimination(true);
-			getTournamentGUI().getRoundTabbedPane().addSwissTab(
-					roundNumber, r.getPanel());
+			getTournamentGUI().getRoundTabbedPane().addSwissTab(roundNumber, r.getPanel());
 		} else {
-			getTournamentGUI().getRoundTabbedPane().addSwissTab(roundNumber,
-					r.getPanel());
+			getTournamentGUI().getRoundTabbedPane().addSwissTab(roundNumber, r.getPanel());
 		}
 
 	}
@@ -567,8 +568,7 @@ public class MusTournament implements XMLObject, Tournament {
 
 		List<MusPlayer> tempList = new ArrayList<MusPlayer>();
 		tempList.addAll(userList);
-		Collections.sort(tempList, new MusComparator(this,
-				MusComparator.pairingCompare));
+		Collections.sort(tempList, new MusComparator(this, MusComparator.pairingCompare));
 
 		MusMatch byeMatch = null;
 		// Setup the bye match if necessary
@@ -579,12 +579,8 @@ public class MusTournament implements XMLObject, Tournament {
 			int byUserCounter = 1;
 			int minByes = 0;
 			try {
-				while (byeUser == null
-						|| byeUser.getByes(this) > minByes
-						|| (byeUser.getMatches(this) != null && byeUser
-								.getMatches(this)
-								.get(byeUser.getMatches(this).size() - 1)
-								.isBye())) {
+				while (byeUser == null || byeUser.getByes(this) > minByes || (byeUser.getMatches(this) != null
+						&& byeUser.getMatches(this).get(byeUser.getMatches(this).size() - 1).isBye())) {
 					if (byUserCounter > tempList.size()) {
 						minByes++;
 						byUserCounter = 1;
@@ -601,13 +597,10 @@ public class MusTournament implements XMLObject, Tournament {
 			tempList.remove(byeUser);
 		}
 
-		matches = new MusRandomMatchGeneration(this, tempList)
-				.generateMatches();
+		matches = new MusRandomMatchGeneration(this, tempList).generateMatches();
 
 		if (MusMatch.hasDuplicate(matches)) {
-			JOptionPane
-					.showMessageDialog(Main.getInstance(),
-							Language.duplicate_resolution_failure);
+			JOptionPane.showMessageDialog(Main.getInstance(), Language.duplicate_resolution_failure);
 		}
 
 		// Add the bye match at the end
@@ -619,7 +612,7 @@ public class MusTournament implements XMLObject, Tournament {
 	}
 
 	@Override
-	public void generateSingleEliminationMatches(int cutSize) {
+	public void generateSingleEliminationMatches(int cutSize, boolean special) {
 
 		List<MusMatch> matches = new ArrayList<>();
 
@@ -629,9 +622,8 @@ public class MusTournament implements XMLObject, Tournament {
 			List<MusMatch> lastRoundMatches = getLatestRound().getMatches();
 
 			for (int index = 0; index < lastRoundMatches.size(); index = index + 2) {
-				MusMatch newMatch = new MusMatch(lastRoundMatches
-						.get(index).getWinner(), lastRoundMatches
-						.get(index + 1).getWinner());
+				MusMatch newMatch = new MusMatch(lastRoundMatches.get(index).getWinner(),
+						lastRoundMatches.get(index + 1).getWinner());
 				matches.add(newMatch);
 			}
 
@@ -639,51 +631,56 @@ public class MusTournament implements XMLObject, Tournament {
 		} else {
 			List<MusPlayer> tempList = new ArrayList<>();
 			tempList.addAll(getXWingPlayers());
-			Collections.sort(tempList, new MusComparator(this,
-					MusComparator.rankingCompare));
+			Collections.sort(tempList, new MusComparator(this, MusComparator.rankingCompare));
 			tempList = tempList.subList(0, cutSize);
 
-			while (tempList.isEmpty() == false) {
-				MusPlayer player1 = tempList.get(0);
-				MusPlayer player2 = tempList.get(tempList.size() - 1);
-				tempList.remove(player1);
-				if (player1 == player2) {
-					player2 = null;
-				} else {
-					tempList.remove(player2);
+			if (special) {
+				MusMatch match1 = new MusMatch(tempList.get(0), tempList.get(1));
+				MusMatch match2 = new MusMatch(tempList.get(2), tempList.get(3));
+				matchesCorrected.add(match1);
+				matchesCorrected.add(match2);
+			} else {
+				while (tempList.isEmpty() == false) {
+					MusPlayer player1 = tempList.get(0);
+					MusPlayer player2 = tempList.get(tempList.size() - 1);
+					tempList.remove(player1);
+					if (player1 == player2) {
+						player2 = null;
+					} else {
+						tempList.remove(player2);
+					}
+
+					MusMatch match = new MusMatch(player1, player2);
+					matches.add(match);
 				}
 
-				MusMatch match = new MusMatch(player1, player2);
-				matches.add(match);
-			}
-
-			switch (matches.size()) {
-			case 4:
-				matchesCorrected.add(matches.get(0));
-				matchesCorrected.add(matches.get(3));
-				matchesCorrected.add(matches.get(2));
-				matchesCorrected.add(matches.get(1));
-				break;
-			case 8:
-				matchesCorrected.add(matches.get(0));
-				matchesCorrected.add(matches.get(7));
-				matchesCorrected.add(matches.get(4));
-				matchesCorrected.add(matches.get(3));
-				matchesCorrected.add(matches.get(2));
-				matchesCorrected.add(matches.get(5));
-				matchesCorrected.add(matches.get(6));
-				matchesCorrected.add(matches.get(1));
-				break;
-			default:
-				matchesCorrected = matches;
+				switch (matches.size()) {
+				case 4:
+					matchesCorrected.add(matches.get(0));
+					matchesCorrected.add(matches.get(3));
+					matchesCorrected.add(matches.get(2));
+					matchesCorrected.add(matches.get(1));
+					break;
+				case 8:
+					matchesCorrected.add(matches.get(0));
+					matchesCorrected.add(matches.get(7));
+					matchesCorrected.add(matches.get(4));
+					matchesCorrected.add(matches.get(3));
+					matchesCorrected.add(matches.get(2));
+					matchesCorrected.add(matches.get(5));
+					matchesCorrected.add(matches.get(6));
+					matchesCorrected.add(matches.get(1));
+					break;
+				default:
+					matchesCorrected = matches;
+				}
 			}
 		}
 
 		MusRound r = new MusRound(matchesCorrected, this, null);
 		r.setSingleElimination(true);
 		rounds.add(r);
-		getTournamentGUI().getRoundTabbedPane().addSingleEliminationTab(
-				cutSize, r.getPanel());
+		getTournamentGUI().getRoundTabbedPane().addSingleEliminationTab(cutSize, r.getPanel());
 
 		CryodexController.saveData();
 	}
@@ -715,8 +712,8 @@ public class MusTournament implements XMLObject, Tournament {
 		XMLUtils.appendObject(sb, "POINTS", points);
 		XMLUtils.appendObject(sb, "NAME", name);
 		XMLUtils.appendObject(sb, "MODULE", Modules.XWING.getName());
-		XMLUtils.appendObject(sb,  "TOURNAMENTTYPE", tournamentType);
-		
+		XMLUtils.appendObject(sb, "TOURNAMENTTYPE", tournamentType);
+
 		return sb;
 	}
 
@@ -727,19 +724,19 @@ public class MusTournament implements XMLObject, Tournament {
 
 	@Override
 	public void addPlayer(Player p) {
-		
-		for(MusRound r : getAllRounds()){
-			for(MusMatch m : r.getMatches()){
-				if(m.getPlayer1().getPlayer().equals(p)){
+
+		for (MusRound r : getAllRounds()) {
+			for (MusMatch m : r.getMatches()) {
+				if (m.getPlayer1().getPlayer().equals(p)) {
 					getXWingPlayers().add(m.getPlayer1());
 					return;
-				} else if(m.getPlayer2() != null && m.getPlayer2().getPlayer().equals(p)) {
+				} else if (m.getPlayer2() != null && m.getPlayer2().getPlayer().equals(p)) {
 					getXWingPlayers().add(m.getPlayer2());
 					return;
 				}
 			}
 		}
-		
+
 		MusPlayer xPlayer = new MusPlayer(p);
 		getXWingPlayers().add(xPlayer);
 	}
@@ -784,6 +781,7 @@ public class MusTournament implements XMLObject, Tournament {
 	}
 
 	public boolean isElimination() {
-		return tournamentType == TournamentTypeEnum.SINGLE || tournamentType == TournamentTypeEnum.DOUBLE || tournamentType == TournamentTypeEnum.TRIPLE;
+		return tournamentType == TournamentTypeEnum.SINGLE || tournamentType == TournamentTypeEnum.DOUBLE
+				|| tournamentType == TournamentTypeEnum.TRIPLE;
 	}
 }

@@ -28,7 +28,7 @@ public interface Tournament extends XMLObject {
 
 	public void generateRound(int roundNumber);
 
-	public void generateSingleEliminationMatches(int cutSize);
+	public void generateSingleEliminationMatches(int cutSize, boolean special);
 
 	public void startTournament();
 
